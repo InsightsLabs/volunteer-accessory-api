@@ -1,0 +1,58 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: Volunteer Accessory Api
+  datasource:
+    url: ${DATA_SOURCE_URL}
+    username: ${DATA_SOURCE_DB_USER}
+    password: ${DATA_SOURCE_DB_PASSWORD}
+    driverClassName: org.postgresql.Driver
+    hikari:
+      minimumIdle: 5
+      maximumPoolSize: 20
+      idleTimeout: 30000
+      maxLifetime: 2000000
+      connectionTimeout: 30000
+      poolName: HikariPoolBooks
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  mail:
+    host: smtp.zoho.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  jackson:
+    time-zone: America/Sao_Paulo
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+#sentry:
+#  dsn: https://
+#  traces-sample-rate: 1.0
