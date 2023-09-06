@@ -24,7 +24,7 @@ jobs:
 
       - name: Build and run tests
         run: |
-          mvn test -Ptest
+          mvn test -Ptest  -Dspring.profiles.active=test 
 
       - name: Send Slack notification on failure
         if: failure()
