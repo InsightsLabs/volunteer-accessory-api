@@ -25,7 +25,15 @@ jobs:
       - name: Build and run tests
         run: |
           mvn test -Ptest  -Dspring.profiles.active=test 
-
+      - name: Check code coverage
+        run: |
+          COVERAGE=$(mvn jacoco:check -Ptest -Dspring.profiles.active=test | grep "Rule check" | awk '{print $5}')
+          if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then
+            echo "Code coverage is above 80%"
+          else
+            echo "Code coverage is below 80%"
+            exit 1
+          fi
       - name: Send Slack notification on failure
         if: failure()
         env:
