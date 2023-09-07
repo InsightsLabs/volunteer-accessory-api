@@ -64,6 +64,7 @@ jobs:
 
       - name: Build and Push Docker image (arm64)
         run: |
+          echo Job ID: ${{ steps.get-job-id.outputs.job_id }}
           docker buildx create --use
           docker buildx build --platform=linux/arm64 -t $IMAGE_NAME-arm64 --push .
 
@@ -80,6 +81,7 @@ jobs:
 
       - name: Build and Push Docker image (amd64)
         run: |
+          echo Job ID: ${{ steps.get-job-id.outputs.job_id }}
           docker buildx build --platform=linux/amd64 -t $IMAGE_NAME-amd64 --push .
 
       - name: Send Slack notification on failure
