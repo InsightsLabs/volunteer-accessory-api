@@ -81,7 +81,6 @@ jobs:
           OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
         run: |
           echo "Total coverage ${OUTPUT}"
-          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
       - name: Fail PR if overall coverage is less than 90%
         if: ${{ steps.jacoco.outputs.coverage-overall < 90.0 }}
         uses: actions/github-script@v6
