@@ -68,7 +68,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            echo "{COVERAGE}=${{ steps.jacoco.outputs.coverage-overall}}" >> $COVERAGE
+            echo "COVERAGE=${{ steps.jacoco.outputs.coverage-overall}}" >> $GITHUB_ENV
             echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
             core.setFailed('Overall coverage is less than 90%!')
       - name: Send Slack notification on failure
