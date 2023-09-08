@@ -21,6 +21,7 @@ class VolunteerAccessoryApiApplicationTests {
 		VolunteerAccessoryApiApplication.main(new String[]{});
 		assertThat(SpringApplication.run(VolunteerAccessoryApiApplication.class)).isEqualTo(null);
 	*/
+
 	}
 
 }
