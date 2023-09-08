@@ -71,10 +71,8 @@ jobs:
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
       - name: Set COVERAGE and COVERAGE_CHANGED_FILES global variables
-        env:
-          OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
         run: |
-          echo "COVERAGE=${OUTPUT}" >> $GITHUB_ENV;
+          echo "COVERAGE= ${{ toJson(steps.jacoco.outputs.coverage-overall) }}" >> $GITHUB_ENV;
           echo "COVERAGE_CHANGED_FILES=${{ steps.jacoco.outputs.coverage-changed-files }}" >> $GITHUB_ENV
       - name: Get the Coverage info
         env:
