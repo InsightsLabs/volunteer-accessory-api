@@ -36,6 +36,7 @@ jobs:
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:test\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
 
   coverage_validator:
+    permissions: write-all
     needs: test
     runs-on: ubuntu-latest
     steps:
