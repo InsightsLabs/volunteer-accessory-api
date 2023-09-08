@@ -71,7 +71,7 @@ jobs:
 
       - name: Get the Coverage info
         run: |
-          echo "Total coverage ${{ steps.jacoco.outputs }}"
+          echo "Total coverage ${{ steps.jacoco.outputs.coverage }}"
           echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
       - name: Send Slack notification on failure
         if: failure()
