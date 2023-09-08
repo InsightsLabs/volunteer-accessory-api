@@ -7,7 +7,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   IMAGE_NAME: phelliperodrigues/volunteer-accessory-api
-
+  COVERAGE: 0
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -64,12 +64,11 @@ jobs:
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
       - name: Fail PR if overall coverage is less than 80%
-        env:
-          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         if: ${{ steps.jacoco.outputs.coverage-overall < 80.0 }}
         uses: actions/github-script@v6
         with:
           script: |
+            echo "{COVERAGE}=${{ steps.jacoco.outputs.coverage-overall}}" >> $COVERAGE
             echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
             core.setFailed('Overall coverage is less than 90%!')
       - name: Send Slack notification on failure
