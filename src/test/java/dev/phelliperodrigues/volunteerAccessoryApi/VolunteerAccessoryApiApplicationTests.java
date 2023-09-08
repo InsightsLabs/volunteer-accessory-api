@@ -20,6 +20,7 @@ class VolunteerAccessoryApiApplicationTests {
 		utilities.when((MockedStatic.Verification) SpringApplication.run(VolunteerAccessoryApiApplication.class, new String[]{})).thenReturn(null);
 		VolunteerAccessoryApiApplication.main(new String[]{});
 		assertThat(SpringApplication.run(VolunteerAccessoryApiApplication.class)).isEqualTo(null);
-	*/}
+	*/
+	}
 
 }
