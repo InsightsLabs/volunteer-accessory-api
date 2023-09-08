@@ -64,6 +64,8 @@ jobs:
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
       - name: Fail PR if overall coverage is less than 80%
+        env:
+          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         if: ${{ steps.jacoco.outputs.coverage-overall < 80.0 }}
         uses: actions/github-script@v6
         with:
@@ -79,7 +81,6 @@ jobs:
             ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*:${APP_NAME}\n*Author*:${PR_AUTHOR}\n*TITLE*:${PR_TITLE}\n*Coverage:*${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
   notify-result:
@@ -96,6 +97,5 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }} + ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage:*${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
