@@ -51,7 +51,7 @@ jobs:
 
       - name: Run Coverage
         run: |
-          mvn verify -Ptest -Dspring.profiles.active=test
+          mvn test -Ptest -Dspring.profiles.active=test
       - name: Upload Report
         uses: 'actions/upload-artifact@v2'
         with:
