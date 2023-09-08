@@ -71,7 +71,7 @@ jobs:
           min-coverage-changed-files: 60
       - name: Set COVERAGE global variables
         env:
-          OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
+          OUTPUT: ${{ toString(toJson(steps.jacoco.outputs)) }}
         run: |
           echo "COVERAGE=${OUTPUT}" >> $GITHUB_ENV
       - name: Get the Coverage info
