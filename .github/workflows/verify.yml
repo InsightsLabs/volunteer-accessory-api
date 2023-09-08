@@ -69,10 +69,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-      - name: Set COVERAGE and COVERAGE_CHANGED_FILES global variables
+      - name: Set COVERAGE global variables
+        env:
+          OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
         run: |
-          echo "COVERAGE=${{ steps.jacoco.outputs.coverage }}" >> $GITHUB_ENV
-          echo "COVERAGE_CHANGED_FILES=${{ steps.jacoco.outputs.coverage-changed-files }}" >> $GITHUB_ENV
+          echo "COVERAGE=${OUTPUT}" >> $GITHUB_ENV
       - name: Get the Coverage info
         env:
           OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
@@ -105,4 +106,4 @@ jobs:
           PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Coverage Change Files*:${COVERAGE_CHANGED_FILES}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
