@@ -39,6 +39,8 @@ jobs:
   coverage_validator:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -49,16 +51,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      - name: Check code coverage
+      - name: Run Coverage
         run: |
-          COVERAGE=$(mvn jacoco:check -Ptest -Dspring.profiles.active=test | grep "Rule check" | awk '{print $5}')
-          if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then
-            echo "Code coverage is above 80%\n Coverage: " + $COVERAGE
-          else
-            echo "Code coverage is below 80%\n Coverage: " + $COVERAGE
-            exit 1
-          fi
+          mvn verify -Pcoverage -Dspring.profiles.active=test
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
       - name: Send Slack notification on failure
         if: failure()
         env:
