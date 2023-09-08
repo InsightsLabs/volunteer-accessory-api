@@ -32,10 +32,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           AUTHOR_NAME: ${{github.event.commits[0].author.name}}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:test\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:test\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
 
   coverage_validator:
     needs: test
@@ -79,10 +81,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           AUTHOR_NAME: ${{github.event.commits[0].author.name}}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
 
   build_and_publish:
     needs: coverage_validator
@@ -136,63 +140,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           AUTHOR_NAME: ${{github.event.commits[0].author.name}}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:build_and_publish\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
-
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: build_and_publish
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#
-#      - name: Configure SSH key
-#        run: |
-#          mkdir -p ~/.ssh
-#          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-#          chmod 600 ~/.ssh/id_rsa
-#          ssh-keyscan 129.213.129.221 >> ~/.ssh/known_hosts
-#
-#      - name: Deploy to Oracle Cloud
-#        run: |
-#          ssh opc@129.213.129.221 "sh execute.sh"
-#      - name: Send Slack notification on failure
-#        if: failure()
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#          APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
-#          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-#          AUTHOR_NAME: ${{github.event.commits[0].author.name}}
-#          PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:deploy\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
-#  health-check:
-#    runs-on: ubuntu-latest
-#
-#    needs: deploy
-#
-#    steps:
-#      - name: Wait for the service to be available
-#        run: |
-#          response=$(curl -k --retry 10 --retry-connrefused --retry-delay 5 -v https://129.213.129.221/health)
-#          if echo "$response" | grep -q "UP"; then
-#            echo "Health-check succeeded: $response"
-#          else
-#            echo "Health-check failed: $response"
-#            exit 1
-#          fi
-#      - name: Send Slack notification on failure
-#        if: failure()
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#          APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
-#          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-#          AUTHOR_NAME: ${{github.event.commits[0].author.name}}
-#          PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:health-check\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:build_and_publish\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
   notify-result:
     runs-on: ubuntu-latest
 
@@ -205,7 +158,9 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           AUTHOR_NAME: ${{github.event.commits[0].author.name}}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Deploy\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME}\n*Commit*:${COMMIT_MESSAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Deploy\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
