@@ -16,12 +16,10 @@ class VolunteerAccessoryApiApplicationTests {
 
 	@Test
 	void testApplication() {
-		/*MockedStatic<SpringApplication> utilities = Mockito.mockStatic(SpringApplication.class);
+		MockedStatic<SpringApplication> utilities = Mockito.mockStatic(SpringApplication.class);
 		utilities.when((MockedStatic.Verification) SpringApplication.run(VolunteerAccessoryApiApplication.class, new String[]{})).thenReturn(null);
 		VolunteerAccessoryApiApplication.main(new String[]{});
 		assertThat(SpringApplication.run(VolunteerAccessoryApiApplication.class)).isEqualTo(null);
-	*/
-
 	}
 
 }
