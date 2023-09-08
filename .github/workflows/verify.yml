@@ -83,7 +83,7 @@ jobs:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*:${APP_NAME}\n*Author*:${PR_AUTHOR}\n*TITLE*:${PR_TITLE}\n*Coverage:*${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*:${APP_NAME}\n*Author*:${PR_AUTHOR}\n*TITLE*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
   notify-result:
     runs-on: ubuntu-latest
 
@@ -99,4 +99,4 @@ jobs:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage:*${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
