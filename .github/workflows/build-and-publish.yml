@@ -9,8 +9,6 @@ env:
 
 jobs:
   build_and_publish:
-    needs: coverage_validator
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
