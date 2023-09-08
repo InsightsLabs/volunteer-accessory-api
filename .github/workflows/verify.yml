@@ -70,8 +70,6 @@ jobs:
           script: |
             echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
             core.setFailed('Overall coverage is less than 90%!')
-
-
       - name: Send Slack notification on failure
         if: failure()
         env:
