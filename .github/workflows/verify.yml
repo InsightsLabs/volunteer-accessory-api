@@ -62,12 +62,14 @@ jobs:
           update-comment: true
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
-      - name: Fail PR if overall coverage is less than 80%
-        if: ${{ steps.jacoco.outputs.coverage-overall < 80.0 }}
+      - name: Set COVERAGE env variable
+        run: |
+          echo "COVERAGE=${{ steps.jacoco.outputs.coverage-overall}}" >> $GITHUB_ENV
+      - name: Fail PR if overall coverage is less than 90%
+        if: ${{ steps.jacoco.outputs.coverage-overall < 90.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            echo "COVERAGE=${{ steps.jacoco.outputs.coverage-overall}}" >> $GITHUB_ENV
             echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
             core.setFailed('Overall coverage is less than 90%!')
       - name: Send Slack notification on failure
