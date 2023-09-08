@@ -52,6 +52,7 @@ jobs:
         run: |
           mvn verify -Pcoverage -Dspring.profiles.active=test
       - name: Jacoco Report to PR
+        id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
