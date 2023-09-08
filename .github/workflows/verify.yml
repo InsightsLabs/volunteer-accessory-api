@@ -70,9 +70,11 @@ jobs:
           title: '# :lobster: Coverage Report'
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
-      - name: Set COVERAGE and COVERAGE_CHANGED_FILES global variables
+      - name: Set COVERAGE global variables
         run: |
-          echo "COVERAGE= ${{ toJson(steps.jacoco.outputs.coverage-overall) }}" >> $GITHUB_ENV;
+          echo "COVERAGE= ${{ toJson(steps.jacoco.outputs.coverage-overall) }}" >> $GITHUB_ENV
+      - name: Set COVERAGE_CHANGED_FILES global variables
+        run: |
           echo "COVERAGE_CHANGED_FILES=${{ steps.jacoco.outputs.coverage-changed-files }}" >> $GITHUB_ENV
       - name: Get the Coverage info
         env:
@@ -95,6 +97,8 @@ jobs:
             ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COVERAGE_CHANGED_FILES: ${{ steps.jacoco.outputs.coverage-changed-files }}
+          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*:${APP_NAME}\n*Author*:${PR_AUTHOR}\n*TITLE*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
   notify-result:
