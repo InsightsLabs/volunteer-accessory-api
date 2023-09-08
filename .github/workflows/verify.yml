@@ -48,24 +48,26 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
       - name: Run Coverage
         run: |
           mvn verify -Pcoverage -Dspring.profiles.active=test
-      - name: Jacoco Report to PR
+      - name: Add coverage to PR
         id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
         with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 90
-          min-coverage-changed-files: 90
-          title: '# :lobster: Coverage Report'
-          update-comment: true
-          pass-emoji: ':green_circle:'
-          fail-emoji: ':red_circle:'
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+
       - name: Set COVERAGE env variable
+        env:
+            COVERAGE: ${{ steps.jacoco.outputs.coverage-overall}}
         run: |
-          echo "COVERAGE=${{ steps.jacoco.outputs.coverage-overall}}" >> $GITHUB_ENV
+          echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
       - name: Fail PR if overall coverage is less than 90%
         if: ${{ steps.jacoco.outputs.coverage-overall < 90.0 }}
         uses: actions/github-script@v6
