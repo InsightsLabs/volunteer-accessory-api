@@ -85,7 +85,7 @@ jobs:
   notify-result:
     runs-on: ubuntu-latest
 
-    needs: build_and_publish
+    needs: coverage_validator
 
     steps:
       - name: Send Slack notification on success
