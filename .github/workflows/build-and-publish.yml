@@ -68,7 +68,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            echo "Coverage: "  ${{ steps.jacoco.outputs.coverage-overall }}
+            echo Coverage: ${{ steps.jacoco.outputs.coverage-overall }}
             core.setFailed('Overall coverage is less than 90%!)
       
 
