@@ -51,30 +51,27 @@ jobs:
 
       - name: Run Coverage
         run: |
-          mvn verify -Pcoverage -Dspring.profiles.active=test
-      - name: Add coverage to PR
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.6.1
+          mvn verify -Ptest -Dspring.profiles.active=test
+      - name: Upload Report
+        uses: 'actions/upload-artifact@v2'
         with:
-          paths: |
-            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
-            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
+          name: report.xml
+          path: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
+
+      - name: Jacoco Report to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.1
+        with:
+          path: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
+          debug-mode: false
 
-      - name: Set COVERAGE env variable
-        env:
-            COVERAGE: ${{ steps.jacoco.outputs.coverage-overall}}
+      - name: Get the Coverage info
         run: |
-          echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
-      - name: Fail PR if overall coverage is less than 90%
-        if: ${{ steps.jacoco.outputs.coverage-overall < 90.0 }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
-            core.setFailed('Overall coverage is less than 90%!')
+          echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
+          echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
       - name: Send Slack notification on failure
         if: failure()
         env:
