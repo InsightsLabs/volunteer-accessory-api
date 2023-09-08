@@ -58,15 +58,16 @@ jobs:
           name: report.xml
           path: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
 
-      - name: Jacoco Report to PR
+      - name: Add coverage to PR
         id: jacoco
-        uses: madrapps/jacoco-report@v1.1
+        uses: madrapps/jacoco-report@v1.6.1
         with:
-          path: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/prodNormalDebugCoverage/prodNormalDebugCoverage.xml,
+            ${{ github.workspace }}/**/build/reports/jacoco/**/debugCoverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-          debug-mode: false
 
       - name: Get the Coverage info
         run: |
