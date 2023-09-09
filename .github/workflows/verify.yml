@@ -67,7 +67,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
-          title: '# :lobster: Coverage Report'
+          title: '# :test_tube: Coverage Report'
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
       - name: Set COVERAGE global variables
