@@ -115,7 +115,7 @@ jobs:
             ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COVERAGE_CHANGED_FILES: ${{env.COVERAGE_CHANGED_FILES}}
-          COVERAGE: ${{env.COVERAGE}}
+          COVERAGE_CHANGED_FILES: ${{ coverage_validator.steps.jacoco.outputs.coverage-changed-files}}
+          COVERAGE: ${{coverage_validator.steps.jacoco.outputs.coverage-overall}}
         run: |
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Coverage Change Files*:${COVERAGE_CHANGED_FILES}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
