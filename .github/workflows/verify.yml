@@ -30,7 +30,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
-          PR_TITLE: ${{ github.event.pull_request.title }} + ${{ github.event.pull_request.number }}
+          PR_TITLE: |
+            ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -118,7 +119,7 @@ jobs:
             ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COVERAGE_CHANGED_FILES: ${{ needs.coverage_validator.steps.jacoco.outputs.coverage-changed-files}}
-          COVERAGE: ${{needs.coverage_validator.steps.jacoco.outputs.coverage-overall}}
+          PR_NUMBER: |
+            PR: #${{ github.event.pull_request.number }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Coverage Change Files*:${COVERAGE_CHANGED_FILES}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify *${PR_NUMBER}*\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
