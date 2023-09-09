@@ -58,10 +58,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - uses: actions/download-artifact@v2
-        with:
-          name: integration-tests-jacoco
-          path: target/
+#      - uses: actions/download-artifact@v2
+#        with:
+#          name: integration-tests-jacoco
+#          path: target/
       - uses: actions/download-artifact@v2
         with:
           name: unit-tests-jacoco
