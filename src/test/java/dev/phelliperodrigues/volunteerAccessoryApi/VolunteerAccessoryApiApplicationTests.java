@@ -24,4 +24,10 @@ class VolunteerAccessoryApiApplicationTests {
 		assertThat(SpringApplication.run(VolunteerAccessoryApiApplication.class)).isEqualTo(null);
 	}
 
+	@Test
+	void validCreationClass() {
+		VolunteerAccessoryApiApplication volunteerAccessoryApiApplication = new VolunteerAccessoryApiApplication();
+		assertThat(volunteerAccessoryApiApplication).isNotNull();
+	}
+
 }
