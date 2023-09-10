@@ -7,9 +7,9 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   IMAGE_NAME: phelliperodrigues/volunteer-accessory-api
-
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,15 +30,16 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          PR_TITLE: ${{ github.event.pull_request.title }} + ${{ github.event.pull_request.number }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-          AUTHOR_NAME: ${{github.event.commits[0].author.name}}
+          PR_TITLE: |
+            ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:test\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:test\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
 
   coverage_validator:
+    name: Coverage Validator
+    permissions: write-all
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -51,36 +52,74 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
       - name: Run Coverage
         run: |
-          mvn verify -Pcoverage -Dspring.profiles.active=test
+          mvn verify -Ptest -Dspring.profiles.active=test
+      - name: Upload Report
+        uses: 'actions/upload-artifact@v2'
+        with:
+          name: report.xml
+          path: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
+
       - name: Jacoco Report to PR
+        id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 90
-          min-coverage-changed-files: 90
-          title: '# :lobster: Coverage Report'
-          update-comment: true
+          min-coverage-overall: 40
+          min-coverage-changed-files: 60
+          title: '# :test_tube: Coverage Report'
           pass-emoji: ':green_circle:'
           fail-emoji: ':red_circle:'
-      - name: Fail PR if overall coverage is less than 80%
-        if: ${{ steps.jacoco.outputs.coverage-overall < 80.0 }}
+      - name: Set COVERAGE global variables
+        run: |
+          echo "COVERAGE= ${{ toJson(steps.jacoco.outputs.coverage-overall) }}" >> $GITHUB_ENV
+      - name: Set COVERAGE_CHANGED_FILES global variables
+        run: |
+          echo "COVERAGE_CHANGED_FILES=${{ steps.jacoco.outputs.coverage-changed-files }}" >> $GITHUB_ENV
+      - name: Get the Coverage info
+        env:
+          OUTPUT: ${{ toJson(steps.jacoco.outputs) }}
+        run: |
+          echo "Total coverage ${OUTPUT}"
+      - name: Fail PR if overall coverage is less than 90%
+        if: ${{ steps.jacoco.outputs.coverage-overall < 90.0 }}
         uses: actions/github-script@v6
         with:
           script: |
-            echo Overall coverage is less than 80%!=>  ${{ steps.jacoco.outputs.coverage-overall}}
             core.setFailed('Overall coverage is less than 90%!')
       - name: Send Slack notification on failure
         if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          PR_TITLE: ${{ github.event.pull_request.title }} + ${{ github.event.pull_request.number }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-          AUTHOR_NAME: ${{github.event.commits[0].author.name}}
+          PR_TITLE: |
+            ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.name }}
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COVERAGE_CHANGED_FILES: ${{ steps.jacoco.outputs.coverage-changed-files }}
+          COVERAGE: ${{ steps.jacoco.outputs.coverage-overall }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:coverage_validator\n*Repository*:${APP_NAME}\n*Author*:${PR_AUTHOR}\n*TITLE*:${PR_TITLE}\n*Coverage*:${COVERAGE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
+  notify-result:
+    name: Notify Result on Slack
+    runs-on: ubuntu-latest
+
+    needs: coverage_validator
+
+    steps:
+      - name: Send Slack notification on success
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          APP_NAME: ${{ github.event.repository.name }} # Nome do repositório Git (app)
+          PR_TITLE: |
+            ${{ github.event.pull_request.title }}  PR: #${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.name }}
+          PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: |
+            PR: #${{ github.event.pull_request.number }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":white_check_mark:\n Success Verify *${PR_NUMBER}*\n*Repository*: ${APP_NAME}\n*Author*:${PR_AUTHOR}\n*Commit/PR*:${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
