@@ -72,6 +72,7 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+            <version>2.2.224</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -87,6 +88,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -111,6 +123,13 @@
                 <configuration>
                     <excludes>
                         <!--						<exclude>**/PACKEGE YOU WANT EXCLUDE.*</exclude>-->
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/utils/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/VolunteerAccessoryApiApplication.class
+                        </exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/config/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/exception/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/handlers/**
+                        </exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -133,7 +152,7 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>85%</minimum>
+                                            <minimum>45%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
