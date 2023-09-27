@@ -1,5 +1,6 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests;
 
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,4 +16,12 @@ public class SectorRequest {
     private String name;
     private String observations;
     private boolean active;
+
+    public Sector toSector() {
+        return Sector.builder()
+                .name(this.name)
+                .observations(this.observations)
+                .active(this.active)
+                .build();
+    }
 }

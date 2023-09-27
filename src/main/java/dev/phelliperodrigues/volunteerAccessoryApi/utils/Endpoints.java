@@ -1,4 +1,4 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web;
+package dev.phelliperodrigues.volunteerAccessoryApi.utils;
 
 public abstract class Endpoints {
 

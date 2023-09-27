@@ -4,6 +4,7 @@ import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,16 +17,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
-import static dev.phelliperodrigues.volunteerAccessoryApi.application.web.Endpoints.SECTOR_API;
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
 @RestController
 @RequestMapping(SECTOR_API)
 @Tag(name = "Setor")
 public class SectorController {
 
+    private final SectorService sectorService;
+
+    public SectorController(SectorService sectorService) {
+        this.sectorService = sectorService;
+    }
 
     @Operation(
             summary = "Criar um setor",
@@ -42,16 +46,9 @@ public class SectorController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SectorResponse> create(@RequestBody @Valid SectorRequest request) {
-        var id = UUID.randomUUID();
-        return ResponseEntity.created(URI.create(SECTOR_API + "/" + id))
-                .body(SectorResponse.builder()
-                        .id(id)
-                        .name(request.getName())
-                        .observations(request.getObservations())
-                        .active(request.isActive())
-                        .createdAt(LocalDateTime.now())
-                        .createUserId(UUID.randomUUID())
-                        .build());
+        var sector = sectorService.create(request.toSector());
+        return ResponseEntity.created(URI.create(SECTOR_API + "/" + sector.getId()))
+                .body(SectorResponse.build(sector));
 
     }
 

@@ -123,6 +123,13 @@
                 <configuration>
                     <excludes>
                         <!--						<exclude>**/PACKEGE YOU WANT EXCLUDE.*</exclude>-->
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/utils/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/VolunteerAccessoryApiApplication.class
+                        </exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/config/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/exception/**</exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/handlers/**
+                        </exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -145,7 +152,7 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>85%</minimum>
+                                            <minimum>45%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

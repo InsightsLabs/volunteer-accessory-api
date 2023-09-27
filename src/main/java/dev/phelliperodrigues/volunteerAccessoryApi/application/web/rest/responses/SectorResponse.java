@@ -1,6 +1,7 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,18 @@ public class SectorResponse {
     private UUID createUserId;
     @JsonProperty("update_user_id")
     private UUID updateUserId;
+
+
+    public static SectorResponse build(Sector sector) {
+        return SectorResponse.builder()
+                .id(sector.getId())
+                .name(sector.getName())
+                .observations(sector.getObservations())
+                .active(sector.isActive())
+                .createdAt(sector.getCreatedAt())
+                .updatedAt(sector.getUpdatedAt())
+                .createUserId(sector.getCreateUserId())
+                .updateUserId(sector.getUpdateUserId())
+                .build();
+    }
 }
