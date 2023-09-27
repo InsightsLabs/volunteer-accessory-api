@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplication;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import static org.hamcrest.Matchers.containsString;
 @ContextConfiguration(classes = VolunteerAccessoryApiApplication.class)
 class SectorControllerITest extends TestIT {
 
-    Faker faker = new Faker();
+    private final Faker faker = FakerUtil.getInstance();
 
     @Autowired
     private MockMvc mvc;

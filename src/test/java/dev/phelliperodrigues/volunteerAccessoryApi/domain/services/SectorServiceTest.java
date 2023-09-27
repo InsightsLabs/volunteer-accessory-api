@@ -1,6 +1,8 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.domain.services;
 
+import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class SectorServiceTest {
 
+    private final Faker faker = FakerUtil.getInstance();
     private SectorService sectorService;
 
     @BeforeEach
@@ -21,7 +24,11 @@ class SectorServiceTest {
     @Test
     @DisplayName("Should create sector with success")
     void create() {
-        var sector = Sector.builder().build();
+        var sector = Sector.builder()
+                .name(faker.company().industry())
+                .observations(faker.lorem().sentence(10))
+                .active(faker.bool().bool())
+                .build();
         var sectorCreated = sectorService.create(sector);
 
         Assertions.assertNotNull(sectorCreated);
