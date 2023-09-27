@@ -24,7 +24,11 @@ jobs:
 
       - name: Build and run tests
         run: |
-          mvn test -Ptest  -Dspring.profiles.active=test
+          mvn verify -Ptest  -Dspring.profiles.active=test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Send Slack notification on failure
         if: failure()
         env:
@@ -96,14 +100,7 @@ jobs:
           PIPE_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data "{\"text\":\":x:\nFail Deploy\n*Job*:build_and_publish\n*Repository*: ${APP_NAME}\n*Author*:${AUTHOR_NAME} ${PR_AUTHOR}\n*Commit/PR*:${COMMIT_MESSAGE} ${PR_TITLE}\n*Action*:${PIPE_URL}\"}" $SLACK_WEBHOOK_URL
-  codecov:
-    name: Codecov
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   notify-result:
     runs-on: ubuntu-latest
 
