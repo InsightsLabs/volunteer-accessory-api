@@ -21,4 +21,11 @@ public class Sector {
     private UUID updateUserId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public Sector create(UUID createUserId) {
+        this.setId(UUID.randomUUID());
+        this.setCreatedAt(LocalDateTime.now());
+        this.setCreateUserId(createUserId);
+        return this;
+    }
 }
