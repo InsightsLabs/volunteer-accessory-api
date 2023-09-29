@@ -34,3 +34,4 @@ build/
 
 dev.env
 prod.env
+/.jpb/jpb-settings.xml

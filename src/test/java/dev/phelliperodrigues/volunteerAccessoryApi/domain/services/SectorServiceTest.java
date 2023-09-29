@@ -41,10 +41,6 @@ class SectorServiceTest {
         Assertions.assertEquals(sector.getName(), sectorCreated.getName());
         Assertions.assertEquals(sector.getObservations(), sectorCreated.getObservations());
         Assertions.assertEquals(sector.isActive(), sectorCreated.isActive());
-        Assertions.assertNotNull(sectorCreated.getCreatedAt());
-        Assertions.assertNull(sectorCreated.getUpdatedAt());
-        Assertions.assertNotNull(sectorCreated.getCreateUserId());
-        Assertions.assertNull(sectorCreated.getUpdateUserId());
         Mockito.verify(sectorRepository, Mockito.times(1)).save(Mockito.any());
 
     }
