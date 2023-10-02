@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 class SectorServiceTest {
 
@@ -47,6 +49,7 @@ class SectorServiceTest {
 
     private Sector buildSector() {
         return Sector.builder()
+                .id(UUID.randomUUID())
                 .name(faker.company().industry())
                 .observations(faker.lorem().sentence(10))
                 .active(faker.bool().bool())

@@ -15,7 +15,7 @@ spring:
       settings.trace: false
       settings.web-allow-others: false
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect

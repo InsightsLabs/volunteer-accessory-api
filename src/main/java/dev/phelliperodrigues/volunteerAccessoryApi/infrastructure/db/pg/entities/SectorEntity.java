@@ -1,12 +1,10 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities;
 
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -22,6 +20,8 @@ import java.util.UUID;
 public class SectorEntity {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
     private String name;

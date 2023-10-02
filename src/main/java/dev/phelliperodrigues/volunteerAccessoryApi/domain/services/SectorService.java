@@ -16,13 +16,10 @@ public class SectorService {
     private final SectorRepository sectorRepository;
 
     public Sector create(Sector sector) {
-        sector.create(UUID.randomUUID());
+        sector.setCreateUserId(UUID.randomUUID());
         var created = sectorRepository.save(sector);
         log.info("Sector {} created", created.getId());
         return created;
     }
-
-    public Sector findById(UUID id) {
-        return null;
-    }
+    
 }

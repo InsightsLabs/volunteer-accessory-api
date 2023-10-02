@@ -19,9 +19,4 @@ public class Sector {
     private UUID createUserId;
     private UUID updateUserId;
 
-    public Sector create(UUID createUserId) {
-        this.setId(UUID.randomUUID());
-        this.setCreateUserId(createUserId);
-        return this;
-    }
 }
