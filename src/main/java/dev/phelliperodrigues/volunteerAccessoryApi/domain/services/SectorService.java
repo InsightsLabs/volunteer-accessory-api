@@ -1,11 +1,11 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.domain.services;
 
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -13,11 +13,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SectorService {
 
-    public Sector create(Sector sector) {
-        sector.setId(UUID.randomUUID());
-        sector.setCreatedAt(LocalDateTime.now());
-        sector.setCreateUserId(UUID.randomUUID());
+    private final SectorRepository sectorRepository;
 
-        return sector;
+    public Sector create(Sector sector) {
+        sector.setCreateUserId(UUID.randomUUID());
+        var created = sectorRepository.save(sector);
+        log.info("Sector {} created", created.getId());
+        return created;
     }
+    
 }

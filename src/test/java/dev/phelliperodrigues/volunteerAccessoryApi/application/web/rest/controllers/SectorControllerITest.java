@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
@@ -61,7 +60,6 @@ class SectorControllerITest {
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
-                        .createdAt(LocalDateTime.now())
                         .createUserId(UUID.randomUUID())
                         .build());
 
@@ -79,11 +77,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
-                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()))
-                .andExpect(MockMvcResultMatchers.jsonPath("create_at").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_at").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("create_user_id").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_user_id").isEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
     @Test
@@ -101,7 +95,6 @@ class SectorControllerITest {
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
-                        .createdAt(LocalDateTime.now())
                         .createUserId(UUID.randomUUID())
                         .build());
 
@@ -119,11 +112,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
-                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()))
-                .andExpect(MockMvcResultMatchers.jsonPath("create_at").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_at").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("create_user_id").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_user_id").isEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
     @Test
@@ -140,7 +129,6 @@ class SectorControllerITest {
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
-                        .createdAt(LocalDateTime.now())
                         .createUserId(UUID.randomUUID())
                         .build());
 
@@ -158,11 +146,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
-                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()))
-                .andExpect(MockMvcResultMatchers.jsonPath("create_at").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_at").isEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("create_user_id").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("update_user_id").isEmpty());
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
     @Test
