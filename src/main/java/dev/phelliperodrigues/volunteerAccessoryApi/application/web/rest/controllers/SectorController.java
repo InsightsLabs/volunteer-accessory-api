@@ -1,5 +1,6 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers;
 
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ApiError;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ErrorDefault;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
@@ -52,6 +53,27 @@ public class SectorController {
         return ResponseEntity.created(URI.create(SECTOR_API + "/" + sector.getId()))
                 .body(SectorResponse.build(sector));
 
+    }
+
+    @Operation(
+            summary = "Buscar setor por id",
+            description = "Endpoint de criação de setor",
+            tags = {"Setor"}
+    )
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            }
+    )
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<SectorResponse> findById(@PathVariable String id) {
+        var sector = sectorService.findById(id);
+        return ResponseEntity.ok(SectorResponse.build(sector));
     }
 
 

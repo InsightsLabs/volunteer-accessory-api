@@ -6,6 +6,7 @@ import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplicat
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
+import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,7 +47,7 @@ class SectorControllerITest {
 
 
     @Test
-    @DisplayName("Should create a valid and active sector")
+    @DisplayName("[CREATE] Should create a valid and active sector")
     void shouldCreateValidSector() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -81,7 +83,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should create a valid sector without observation")
+    @DisplayName("[CREATE] Should create a valid sector without observation")
     void shouldCreateValidSectorWithoutObservation() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -116,7 +118,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should create a valid sector without active and observation")
+    @DisplayName("[CREATE] Should create a valid sector without active and observation")
     void shouldCreateValidSectorWithoutActiveAndObservation() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -150,7 +152,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if name is null")
+    @DisplayName("[CREATE] Should return bad request if name is null")
     void shouldReturnBadRequestIfNameIsNull() throws Exception {
 
         var request = SectorRequest.builder()
@@ -175,7 +177,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if name is empty")
+    @DisplayName("[CREATE] Should return bad request if name is empty")
     void shouldReturnBadRequestIfNameIsEmpty() throws Exception {
 
         var request = SectorRequest.builder()
@@ -200,7 +202,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if without name")
+    @DisplayName("[CREATE] Should return bad request if without name")
     void shouldReturnBadRequestIfWithoutName() throws Exception {
 
         var request = SectorRequest.builder()
@@ -223,5 +225,64 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
     }
 
+    @Test
+    @DisplayName("[FIND BY ID] Should return a sector with success")
+    void findByIdWithSuccess() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        var sector = Sector.builder()
+                .id(uuid)
+                .name(faker.company().industry())
+                .observations(faker.lorem().paragraph())
+                .active(faker.bool().bool())
+                .build();
+        BDDMockito.given(sectorService.findById(uuid.toString()))
+                .willReturn(sector);
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON);
 
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").value(uuid.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(sector.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(sector.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(sector.isActive()));
+    }
+
+    @Test
+    @DisplayName("[FIND BY ID] Should return bad request if ID is not valid")
+    void findByIdBadRequest() throws Exception {
+
+        BDDMockito.given(sectorService.findById("123"))
+                .willThrow(Exceptions.invalidIdException("123"));
+
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Bad Request"))
+                .andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("ID: 123 com formato inválido"))
+                .andExpect(MockMvcResultMatchers.jsonPath("error").value("400 BAD_REQUEST \"ID: 123 com formato inválido\""));
+    }
+
+    @Test
+    @DisplayName("[FIND BY ID] Should return not found if not match ID")
+    void findByIdNotFound() throws Exception {
+
+        BDDMockito.given(sectorService.findById("123"))
+                .willThrow(Exceptions.notFoundException("Setor não encontrado"));
+
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Setor não encontrado"))
+                .andExpect(MockMvcResultMatchers.jsonPath("error").value("404 NOT_FOUND \"Setor não encontrado\""));
+    }
 }
