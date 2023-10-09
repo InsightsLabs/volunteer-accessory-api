@@ -253,7 +253,7 @@ class SectorControllerITest {
     void findByIdBadRequest() throws Exception {
 
         BDDMockito.given(sectorService.findById("123"))
-                .willThrow(Exceptions.invalidIdException());
+                .willThrow(Exceptions.invalidIdException("123"));
 
         var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -263,8 +263,8 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("status").value("Bad Request"))
                 .andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Formato do ID inválido"))
-                .andExpect(MockMvcResultMatchers.jsonPath("error").value("400 BAD_REQUEST \"Formato do ID inválido\""));
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("ID: 123 com formato inválido"))
+                .andExpect(MockMvcResultMatchers.jsonPath("error").value("400 BAD_REQUEST \"ID: 123 com formato inválido\""));
     }
 
     @Test

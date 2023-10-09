@@ -5,8 +5,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class Exceptions {
 
-    public static ResponseStatusException invalidIdException() {
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Formato do ID inválido");
+    public static ResponseStatusException invalidIdException(String id) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("ID: %s com formato inválido", id));
     }
 
     public static ResponseStatusException notFoundException(String message) {

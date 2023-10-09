@@ -26,10 +26,10 @@ public class SectorService {
     public Sector findById(String id) {
         try {
             return sectorRepository.findById(UUID.fromString(id))
-                    .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado"));
+                    .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
 
         } catch (IllegalArgumentException ex) {
-            throw Exceptions.invalidIdException();
+            throw Exceptions.invalidIdException(id);
         }
     }
 }
