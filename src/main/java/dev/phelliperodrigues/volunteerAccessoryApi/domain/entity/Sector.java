@@ -19,4 +19,12 @@ public class Sector {
     private UUID createUserId;
     private UUID updateUserId;
 
+    public static class SectorBuilder {
+        public SectorBuilder idByString(String id) {
+            if (id != null)
+                this.id = UUID.fromString(id);
+            return this;
+        }
+    }
+
 }

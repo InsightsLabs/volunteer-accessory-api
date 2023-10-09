@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -105,9 +104,23 @@ public class SectorController {
             @RequestParam(name = "active", required = false) boolean active,
             @Parameter(hidden = true) Pageable pageable
     ) {
-        var search = Sector.builder().id(id != null ? UUID.fromString(id) : null).name(name).active(active).build();
+        var search = Sector.builder()
+                .idByString(id)
+                .name(name)
+                .active(active)
+                .build();
+
         var result = sectorService.findAllBy(search, pageable);
-        var sectorPaginate = new PageImpl<>(result.getContent().stream().map(SectorResponse::build).toList(), pageable, result.getTotalPages());
+
+        var sectorPaginate = new PageImpl<>(
+                result.getContent()
+                        .stream()
+                        .map(SectorResponse::build)
+                        .toList(),
+                pageable,
+                result.getTotalPages()
+        );
+
         return ResponseEntity.ok(new SectorPageResponse(sectorPaginate));
     }
 
