@@ -59,7 +59,7 @@ class SectorServiceTest {
         var sector = buildSector();
         Mockito.when(sectorRepository.findById(Mockito.any())).thenReturn(Optional.of(sector));
 
-        var result = sectorService.findById(UUID.randomUUID());
+        var result = sectorService.findById(UUID.randomUUID().toString());
 
 
         Assertions.assertNotNull(result);
@@ -79,17 +79,18 @@ class SectorServiceTest {
         var throwable = Assertions.assertThrows(ResponseStatusException.class, () -> sectorService.findById(UUID.randomUUID().toString()));
 
         assertEquals(HttpStatus.NOT_FOUND, throwable.getStatusCode());
+        Mockito.verify(sectorRepository, Mockito.times(1)).findById(Mockito.any());
 
     }
 
     @Test
     @DisplayName("[findById()] Should handle exception ResponseStatusException from BadRequest when id is not valid")
     void findByIdBadRequest() {
-        Mockito.when(sectorRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         var throwable = Assertions.assertThrows(ResponseStatusException.class, () -> sectorService.findById("123"));
 
         assertEquals(HttpStatus.BAD_REQUEST, throwable.getStatusCode());
+        Mockito.verify(sectorRepository, Mockito.never()).findById(Mockito.any());
 
     }
 

@@ -27,6 +27,7 @@ public class SectorRepositoryImpl implements SectorRepository {
 
     @Override
     public Optional<Sector> findById(UUID id) {
-        return Optional.empty();
+        return sectorEntityRepository.findById(id)
+                .map(SectorEntity::toSector);
     }
 }

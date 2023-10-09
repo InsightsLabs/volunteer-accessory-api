@@ -2,6 +2,7 @@ package dev.phelliperodrigues.volunteerAccessoryApi.domain.services;
 
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRepository;
+import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,13 @@ public class SectorService {
         return created;
     }
 
-    public Sector findById(String uuid) {
-        return null;
+    public Sector findById(String id) {
+        try {
+            return sectorRepository.findById(UUID.fromString(id))
+                    .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado"));
+
+        } catch (IllegalArgumentException ex) {
+            throw Exceptions.invalidIdException();
+        }
     }
 }
