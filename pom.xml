@@ -130,6 +130,7 @@
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/exception/**</exclude>
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/handlers/**
                         </exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/infrastructure/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
