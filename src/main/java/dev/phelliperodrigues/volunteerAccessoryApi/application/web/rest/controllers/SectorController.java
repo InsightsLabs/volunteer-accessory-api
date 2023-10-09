@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -52,6 +53,26 @@ public class SectorController {
         return ResponseEntity.created(URI.create(SECTOR_API + "/" + sector.getId()))
                 .body(SectorResponse.build(sector));
 
+    }
+
+    @Operation(
+            summary = "Buscar setor por id",
+            description = "Endpoint de criação de setor",
+            tags = {"Setor"}
+    )
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            }
+    )
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<SectorResponse> findById(@PathVariable UUID id) {
+        var sector = sectorService.findById(id);
+        return ResponseEntity.ok(SectorResponse.build(sector));
     }
 
 
