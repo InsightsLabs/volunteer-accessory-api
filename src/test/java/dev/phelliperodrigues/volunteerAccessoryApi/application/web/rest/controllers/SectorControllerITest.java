@@ -6,6 +6,7 @@ import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplicat
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
+import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -246,5 +248,41 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(sector.isActive()));
     }
 
+    @Test
+    @DisplayName("[FIND BY ID] Should return bad request if ID is not valid")
+    void findByIdBadRequest() throws Exception {
 
+        BDDMockito.given(sectorService.findById("123"))
+                .willThrow(Exceptions.invalidIdException());
+
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Bad Request"))
+                .andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Formato do ID inválido"))
+                .andExpect(MockMvcResultMatchers.jsonPath("error").value("400 BAD_REQUEST \"Formato do ID inválido\""));
+    }
+
+    @Test
+    @DisplayName("[FIND BY ID] Should return not found if not match ID")
+    void findByIdNotFound() throws Exception {
+
+        BDDMockito.given(sectorService.findById("123"))
+                .willThrow(Exceptions.notFoundException("Setor não encontrado"));
+
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Setor não encontrado"))
+                .andExpect(MockMvcResultMatchers.jsonPath("error").value("404 NOT_FOUND \"Setor não encontrado\""));
+    }
 }
