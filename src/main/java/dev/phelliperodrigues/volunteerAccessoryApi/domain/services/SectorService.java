@@ -21,5 +21,8 @@ public class SectorService {
         log.info("Sector {} created", created.getId());
         return created;
     }
-    
+
+    public Sector findById(UUID uuid) {
+        return null;
+    }
 }

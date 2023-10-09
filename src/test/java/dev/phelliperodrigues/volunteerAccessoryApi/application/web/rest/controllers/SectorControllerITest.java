@@ -45,7 +45,7 @@ class SectorControllerITest {
 
 
     @Test
-    @DisplayName("Should create a valid and active sector")
+    @DisplayName("[CREATE] Should create a valid and active sector")
     void shouldCreateValidSector() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -81,7 +81,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should create a valid sector without observation")
+    @DisplayName("[CREATE] Should create a valid sector without observation")
     void shouldCreateValidSectorWithoutObservation() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -116,7 +116,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should create a valid sector without active and observation")
+    @DisplayName("[CREATE] Should create a valid sector without active and observation")
     void shouldCreateValidSectorWithoutActiveAndObservation() throws Exception {
         var request = SectorRequest.builder()
                 .name(faker.company().industry())
@@ -150,7 +150,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if name is null")
+    @DisplayName("[CREATE] Should return bad request if name is null")
     void shouldReturnBadRequestIfNameIsNull() throws Exception {
 
         var request = SectorRequest.builder()
@@ -175,7 +175,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if name is empty")
+    @DisplayName("[CREATE] Should return bad request if name is empty")
     void shouldReturnBadRequestIfNameIsEmpty() throws Exception {
 
         var request = SectorRequest.builder()
@@ -200,7 +200,7 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("Should return bad request if without name")
+    @DisplayName("[CREATE] Should return bad request if without name")
     void shouldReturnBadRequestIfWithoutName() throws Exception {
 
         var request = SectorRequest.builder()
@@ -221,6 +221,29 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+    }
+
+    @Test
+    @DisplayName("[FIND BY ID] Should return a sector with success")
+    void findByIdWithSuccess() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        var sector = Sector.builder()
+                .id(uuid)
+                .name(faker.company().industry())
+                .observations(faker.lorem().paragraph())
+                .active(faker.bool().bool())
+                .build();
+        BDDMockito.given(sectorService.findById(uuid))
+                .willReturn(sector);
+        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").value(uuid.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(sector.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(sector.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(sector.isActive()));
     }
 
 
