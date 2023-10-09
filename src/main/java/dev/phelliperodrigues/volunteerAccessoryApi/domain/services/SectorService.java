@@ -22,7 +22,7 @@ public class SectorService {
         return created;
     }
 
-    public Sector findById(UUID uuid) {
+    public Sector findById(String uuid) {
         return null;
     }
 }

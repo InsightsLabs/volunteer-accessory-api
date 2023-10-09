@@ -233,7 +233,7 @@ class SectorControllerITest {
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
                 .build();
-        BDDMockito.given(sectorService.findById(uuid))
+        BDDMockito.given(sectorService.findById(uuid.toString()))
                 .willReturn(sector);
         var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON);

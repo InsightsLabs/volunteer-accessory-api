@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -70,7 +69,7 @@ public class SectorController {
             }
     )
     @GetMapping(value = "/{id}")
-    public ResponseEntity<SectorResponse> findById(@PathVariable UUID id) {
+    public ResponseEntity<SectorResponse> findById(@PathVariable String id) {
         var sector = sectorService.findById(id);
         return ResponseEntity.ok(SectorResponse.build(sector));
     }
