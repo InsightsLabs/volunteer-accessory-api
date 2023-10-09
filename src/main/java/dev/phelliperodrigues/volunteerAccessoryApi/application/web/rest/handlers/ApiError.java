@@ -2,6 +2,8 @@ package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handler
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Date;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiError(String status, String message, String error) {
+public record ApiError(Date timestamp, String status, int statusCode, String message, String error) {
 }

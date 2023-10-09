@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.UUID;
+
 
 @Primary
 @Component
@@ -20,5 +23,11 @@ public class SectorRepositoryImpl implements SectorRepository {
     public Sector save(Sector sector) {
         var sectorEntity = sectorEntityRepository.save(SectorEntity.from(sector));
         return sectorEntity.toSector();
+    }
+
+    @Override
+    public Optional<Sector> findById(UUID id) {
+        return sectorEntityRepository.findById(id)
+                .map(SectorEntity::toSector);
     }
 }
