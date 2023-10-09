@@ -3,6 +3,14 @@ server:
 spring:
   application:
     name: Volunteer Accessory Api
+  data:
+    web:
+      pageable:
+        default-page-size: 25
+        page-parameter: page
+        size-parameter: size
+      sort:
+        sort-parameter: sort
   datasource:
     url: ${DATA_SOURCE_URL}
     username: ${DATA_SOURCE_DB_USER}

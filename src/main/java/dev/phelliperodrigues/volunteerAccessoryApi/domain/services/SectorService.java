@@ -5,9 +5,10 @@ import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRep
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class SectorService {
         }
     }
 
-    public List<Sector> findAllBy(Sector sector) {
-        return List.of();
+    public Page<Sector> findAllBy(Sector sector, Pageable pageable) {
+        return Page.empty();
     }
 }

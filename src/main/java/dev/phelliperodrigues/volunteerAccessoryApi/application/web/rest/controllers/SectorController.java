@@ -4,10 +4,12 @@ import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ErrorDefault;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorPageResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,12 +17,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
+import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -85,16 +90,25 @@ public class SectorController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = SectorResponse.class)), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorPageResponse.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
             }
     )
+    @PageableAsQueryParam
     @GetMapping
-    public ResponseEntity<List<SectorResponse>> findAllBy() {
-        return ResponseEntity.ok(List.of());
+    public ResponseEntity<SectorPageResponse> findAllBy(
+            @RequestParam(name = "id", required = false) String id,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "active", required = false) boolean active,
+            @Parameter(hidden = true) Pageable pageable
+    ) {
+        var search = Sector.builder().id(id != null ? UUID.fromString(id) : null).name(name).active(active).build();
+        var result = sectorService.findAllBy(search, pageable);
+        var sectorPaginate = new PageImpl<>(result.getContent().stream().map(SectorResponse::build).toList(), pageable, result.getTotalPages());
+        return ResponseEntity.ok(new SectorPageResponse(sectorPaginate));
     }
 
 

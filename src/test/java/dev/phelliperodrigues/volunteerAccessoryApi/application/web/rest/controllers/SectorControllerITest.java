@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -300,8 +302,8 @@ class SectorControllerITest {
                 .observations(faker.lorem().paragraph())
                 .active(isActive)
                 .build();
-        BDDMockito.given(sectorService.findAllBy(Mockito.any()))
-                .willReturn(List.of(sector));
+        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+                .willReturn(new PageImpl<>(List.of(sector)));
         var response = MockMvcRequestBuilders.get(SECTOR_API)
                 .queryParam("name", name)
                 .queryParam("active", String.valueOf(isActive))
@@ -310,11 +312,11 @@ class SectorControllerITest {
 
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].id").value(uuid.toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].name").value(sector.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].observations").value(sector.getObservations()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].active").value(sector.isActive()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value(uuid.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name").value(sector.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].observations").value(sector.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].active").value(sector.isActive()));
     }
 
     @Test
@@ -324,8 +326,8 @@ class SectorControllerITest {
         var name = faker.company().industry();
         var isActive = faker.bool().bool();
 
-        BDDMockito.given(sectorService.findAllBy(Mockito.any()))
-                .willReturn(List.of());
+        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+                .willReturn(Page.empty());
         var response = MockMvcRequestBuilders.get(SECTOR_API)
                 .queryParam("name", name)
                 .queryParam("active", String.valueOf(isActive))
@@ -334,8 +336,8 @@ class SectorControllerITest {
 
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", empty()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", empty()))
 
-                .andExpect(MockMvcResultMatchers.jsonPath("$.[0]").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0]").doesNotExist());
     }
 }
