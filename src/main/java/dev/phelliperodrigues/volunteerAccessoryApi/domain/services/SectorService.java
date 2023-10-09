@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -31,5 +32,9 @@ public class SectorService {
         } catch (IllegalArgumentException ex) {
             throw Exceptions.invalidIdException(id);
         }
+    }
+
+    public List<Sector> findAllBy(Sector sector) {
+        return List.of();
     }
 }

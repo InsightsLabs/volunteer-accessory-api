@@ -7,6 +7,7 @@ import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -57,7 +59,7 @@ public class SectorController {
 
     @Operation(
             summary = "Buscar setor por id",
-            description = "Endpoint de criação de setor",
+            description = "Endpoint de busca de setor por ID",
             tags = {"Setor"}
     )
     @ApiResponses(
@@ -74,6 +76,25 @@ public class SectorController {
     public ResponseEntity<SectorResponse> findById(@PathVariable String id) {
         var sector = sectorService.findById(id);
         return ResponseEntity.ok(SectorResponse.build(sector));
+    }
+
+    @Operation(
+            summary = "Buscar setor por termo {id, name, active}",
+            description = "Endpoint de busca de setores por termo paginada",
+            tags = {"Setor"}
+    )
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = SectorResponse.class)), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            }
+    )
+    @GetMapping
+    public ResponseEntity<List<SectorResponse>> findAllBy() {
+        return ResponseEntity.ok(List.of());
     }
 
 
