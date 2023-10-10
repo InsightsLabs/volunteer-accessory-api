@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.Objects;
-
 @Component
 public class TraceIdInterceptor implements HandlerInterceptor {
     private static final String TRACE_ID = "X-Trace-Id";
@@ -19,9 +17,10 @@ public class TraceIdInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String traceId = Objects.requireNonNull(tracer.currentSpan()).context().traceId();
-
-        response.addHeader(TRACE_ID, traceId);
+        if (tracer == null || tracer.currentSpan() == null || tracer.currentSpan().context() == null) {
+            return true;
+        }
+        response.addHeader(TRACE_ID, tracer.currentSpan().context().traceId());
         return true;
     }
 }
