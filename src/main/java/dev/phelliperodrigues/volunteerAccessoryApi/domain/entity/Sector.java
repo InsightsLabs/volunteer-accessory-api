@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromStrg;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -37,7 +39,7 @@ public class Sector {
     public static class SectorBuilder {
         public SectorBuilder idByString(String id) {
             if (id != null)
-                this.id = UUID.fromString(id);
+                this.id = fromStrg(id);
             return this;
         }
     }
