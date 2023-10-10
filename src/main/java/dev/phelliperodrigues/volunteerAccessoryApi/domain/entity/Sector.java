@@ -15,9 +15,14 @@ public class Sector {
     private UUID id;
     private String name;
     private String observations;
-    private boolean active;
+    private Boolean active;
     private UUID createUserId;
     private UUID updateUserId;
+
+
+    public boolean isActive() {
+        return this.active;
+    }
 
     public static class SectorBuilder {
         public SectorBuilder idByString(String id) {

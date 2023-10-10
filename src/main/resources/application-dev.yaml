@@ -16,7 +16,15 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-      timeout: 60000
+      timeout: 5000
+      #      ssl:
+      #        enabled: true
+      jedis:
+        pool:
+          max-active: 8
+          max-wait: -1
+          max-idle: 8
+          min-idle: 0
   datasource:
     url: ${DATA_SOURCE_URL}
     username: ${DATA_SOURCE_DB_USER}
@@ -37,19 +45,21 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
-  mail:
-    host: smtp.zoho.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
+  #  mail:
+  #    host: smtp.zoho.com
+  #    port: 587
+  #    username: ${MAIL_USERNAME}
+  #    password: ${MAIL_PASSWORD}
+  #    properties:
+  #      mail:
+  #        smtp:
+  #          auth: true
+  #          starttls:
+  #            enable: true
+  #            required: true
+  mvc:
+    async:
+      request-timeout: 10
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -59,6 +69,8 @@ spring:
         quartz:
           jobStore:
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  zipkin:
+    base-url: ${ZIPKIN_BASE_URL}
   jackson:
     time-zone: America/Sao_Paulo
     serialization:
@@ -70,6 +82,29 @@ springdoc:
   api-docs:
     path: /v3/api-docs
     enabled: true
+logging:
+  level:
+    org.springframework.data.*.*: info
+    org.springframework.cache.*: info
+    org.springframework.web.servlet.DispatcherServlet: INFO
+  pattern:
+    level: '%5p [${spring.zipkin.service.name:${spring.application.name:}},%X{traceId:-},%X{spanId:-}]'
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,prometheus'
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+
 #application:
 #  security:
 #    jwt:

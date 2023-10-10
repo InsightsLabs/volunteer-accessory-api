@@ -12,21 +12,28 @@ public class SectorPageResponse {
 
     public SectorPageResponse(Page<SectorResponse> page) {
         this.content = page.getContent();
-        this.pageable = new CustomPageable(page.getPageable().getPageNumber(),
-                page.getPageable().getPageSize(), page.getTotalElements());
+        this.pageable = new CustomPageable(
+                page.getPageable().getPageNumber(),
+                page.getTotalPages(),
+                page.getPageable().getPageSize(),
+                page.getTotalElements()
+        );
     }
 
     @Data
     class CustomPageable {
         int pageNumber;
+        int totalPage;
         int pageSize;
         long totalElements;
 
-        public CustomPageable(int pageNumber, int pageSize, long totalElements) {
+
+        public CustomPageable(int pageNumber, int totalPage, int pageSize, long totalElements) {
 
             this.pageNumber = pageNumber;
             this.pageSize = pageSize;
             this.totalElements = totalElements;
+            this.totalPage = totalPage;
         }
     }
 }

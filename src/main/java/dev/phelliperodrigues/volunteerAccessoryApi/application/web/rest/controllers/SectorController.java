@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import java.net.URI;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
+@Slf4j
 @RestController
 @RequestMapping(SECTOR_API)
 @Tag(name = "Setor")
@@ -101,7 +103,7 @@ public class SectorController {
     public ResponseEntity<SectorPageResponse> findAllBy(
             @RequestParam(name = "id", required = false) String id,
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "active", required = false) boolean active,
+            @RequestParam(name = "active", required = false) Boolean active,
             @Parameter(hidden = true) Pageable pageable
     ) {
         var search = Sector.builder()
@@ -118,9 +120,10 @@ public class SectorController {
                         .map(SectorResponse::build)
                         .toList(),
                 pageable,
-                result.getTotalPages()
-        );
+                result.getTotalElements()
 
+        );
+        log.info("{} sectors find", sectorPaginate.getTotalElements());
         return ResponseEntity.ok(new SectorPageResponse(sectorPaginate));
     }
 

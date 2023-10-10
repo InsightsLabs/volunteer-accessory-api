@@ -27,7 +27,7 @@ public class SectorService {
 
     public Sector findById(String id) {
         try {
-            return sectorRepository.findById(UUID.fromString(id))
+            return sectorRepository.findById(dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromString(id))
                     .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
 
         } catch (IllegalArgumentException ex) {
@@ -36,6 +36,7 @@ public class SectorService {
     }
 
     public Page<Sector> findAllBy(Sector sector, Pageable pageable) {
-        return Page.empty();
+        log.info("find all sector by: {}", sector);
+        return sectorRepository.findAllBy(sector, pageable);
     }
 }
