@@ -4,9 +4,12 @@ import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ErrorDefault;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorPageResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.SectorResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +17,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +29,7 @@ import java.net.URI;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
+@Slf4j
 @RestController
 @RequestMapping(SECTOR_API)
 @Tag(name = "Setor")
@@ -57,7 +65,7 @@ public class SectorController {
 
     @Operation(
             summary = "Buscar setor por id",
-            description = "Endpoint de criação de setor",
+            description = "Endpoint de busca de setor por ID",
             tags = {"Setor"}
     )
     @ApiResponses(
@@ -73,6 +81,69 @@ public class SectorController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<SectorResponse> findById(@PathVariable String id) {
         var sector = sectorService.findById(id);
+        return ResponseEntity.ok(SectorResponse.build(sector));
+    }
+
+    @Operation(
+            summary = "Buscar setor por termo {id, name, active}",
+            description = "Endpoint de busca de setores por termo paginada",
+            tags = {"Setor"}
+    )
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorPageResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            }
+    )
+    @PageableAsQueryParam
+    @GetMapping
+    public ResponseEntity<SectorPageResponse> findAllBy(
+            @RequestParam(name = "id", required = false) String id,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "active", required = false) Boolean active,
+            @Parameter(hidden = true) Pageable pageable
+    ) {
+        var search = Sector.builder()
+                .idByString(id)
+                .name(name)
+                .active(active)
+                .build();
+
+        var result = sectorService.findAllBy(search, pageable);
+
+        var sectorPaginate = new PageImpl<>(
+                result.getContent()
+                        .stream()
+                        .map(SectorResponse::build)
+                        .toList(),
+                pageable,
+                result.getTotalElements()
+
+        );
+        log.info("{} sectors find", sectorPaginate.getTotalElements());
+        return ResponseEntity.ok(new SectorPageResponse(sectorPaginate));
+    }
+
+    @Operation(
+            summary = "Atualiza um setor pelo ID",
+            description = "Endpoint de atualização de setor",
+            tags = {"Setor"}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Atualizado com sucesso", content = {@Content(schema = @Schema(implementation = SectorResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+    })
+    @Transactional
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<SectorResponse> update(@RequestBody @Valid SectorRequest request, @PathVariable String id) {
+        var sector = sectorService.update(request.toSector(), id);
         return ResponseEntity.ok(SectorResponse.build(sector));
     }
 
