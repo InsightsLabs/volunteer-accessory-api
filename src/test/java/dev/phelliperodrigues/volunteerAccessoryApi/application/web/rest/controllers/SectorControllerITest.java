@@ -12,10 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,10 +28,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
 import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -284,5 +288,56 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("Setor não encontrado"))
                 .andExpect(MockMvcResultMatchers.jsonPath("error").value("404 NOT_FOUND \"Setor não encontrado\""));
+    }
+
+    @Test
+    @DisplayName("[FIND ALL BY] Should return with success all sectors match")
+    void findAllBy() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        var name = faker.company().industry();
+        var isActive = faker.bool().bool();
+        var sector = Sector.builder()
+                .id(uuid)
+                .name(name)
+                .observations(faker.lorem().paragraph())
+                .active(isActive)
+                .build();
+        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+                .willReturn(new PageImpl<>(List.of(sector)));
+        var response = MockMvcRequestBuilders.get(SECTOR_API)
+                .queryParam("name", name)
+                .queryParam("active", String.valueOf(isActive))
+                .queryParam("id", uuid.toString())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value(uuid.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name").value(sector.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].observations").value(sector.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].active").value(sector.isActive()));
+    }
+
+    @Test
+    @DisplayName("[FIND ALL BY] Should return with success a empty list sectors")
+    void findAllByEmpty() throws Exception {
+        UUID uuid = UUID.randomUUID();
+        var name = faker.company().industry();
+        var isActive = faker.bool().bool();
+
+        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+                .willReturn(Page.empty());
+        var response = MockMvcRequestBuilders.get(SECTOR_API)
+                .queryParam("name", name)
+                .queryParam("active", String.valueOf(isActive))
+                .queryParam("id", uuid.toString())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", empty()))
+
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0]").doesNotExist());
     }
 }

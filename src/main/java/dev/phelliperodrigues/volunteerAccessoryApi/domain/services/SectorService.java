@@ -5,6 +5,8 @@ import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRep
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -25,11 +27,16 @@ public class SectorService {
 
     public Sector findById(String id) {
         try {
-            return sectorRepository.findById(UUID.fromString(id))
+            return sectorRepository.findById(dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromString(id))
                     .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
 
         } catch (IllegalArgumentException ex) {
             throw Exceptions.invalidIdException(id);
         }
+    }
+
+    public Page<Sector> findAllBy(Sector sector, Pageable pageable) {
+        log.info("find all sector by: {}", sector);
+        return sectorRepository.findAllBy(sector, pageable);
     }
 }

@@ -12,9 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -101,6 +104,39 @@ class SectorServiceTest {
                 .observations(faker.lorem().sentence(10))
                 .active(faker.bool().bool())
                 .build();
+    }
+
+    @Test
+    @DisplayName("[findAllBy] Should return all sector by terms")
+    void findAllBy() {
+        var sector = buildSector();
+        Mockito.when(sectorRepository.findAllBy(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of(sector)));
+
+
+        var result = sectorService.findAllBy(sector, Pageable.unpaged());
+
+
+        Assertions.assertNotNull(result);
+        org.assertj.core.api.Assertions.assertThat(result.getContent()).isNotEmpty();
+        assertEquals(sector.getName(), result.getContent().stream().findFirst().get().getName());
+        assertEquals(sector.getObservations(), result.getContent().stream().findFirst().get().getObservations());
+        assertEquals(sector.isActive(), result.getContent().stream().findFirst().get().isActive());
+        Mockito.verify(sectorRepository, Mockito.times(1)).findAllBy(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    @DisplayName("[findAllBy] Should return empty sectors by terms")
+    void findAllByEmpty() {
+        var sector = buildSector();
+        Mockito.when(sectorRepository.findAllBy(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of()));
+
+
+        var result = sectorService.findAllBy(sector, Pageable.unpaged());
+
+
+        Assertions.assertNotNull(result);
+        org.assertj.core.api.Assertions.assertThat(result.getContent()).isEmpty();
+        Mockito.verify(sectorRepository, Mockito.times(1)).findAllBy(Mockito.any(), Mockito.any());
     }
 
 }
