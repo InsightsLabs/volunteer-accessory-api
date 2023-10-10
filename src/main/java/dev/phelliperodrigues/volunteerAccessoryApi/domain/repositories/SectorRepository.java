@@ -14,4 +14,6 @@ public interface SectorRepository {
     Optional<Sector> findById(UUID id);
 
     Page<Sector> findAllBy(Sector sector, Pageable pageable);
+
+    void deleteById(UUID id);
 }

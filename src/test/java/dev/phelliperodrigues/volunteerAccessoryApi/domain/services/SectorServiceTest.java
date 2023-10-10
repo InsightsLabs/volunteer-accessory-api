@@ -248,6 +248,64 @@ class SectorServiceTest {
         verify(sectorRepository, times(1)).save(updatedSector);
     }
 
+
+    // Given a valid sector id, the method should delete the sector from the database.
+    @Test
+    @DisplayName("[DELETE] Given a valid sector id, the method should delete the sector from the database.")
+    public void test_valid_sector_id() {
+        // Mock dependencies
+        UUID sectorId = UUID.randomUUID();
+        Sector sector = new Sector();
+        sector.setId(sectorId);
+
+        // Stub findById method
+        when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
+
+        // Call delete method
+        sectorService.delete(sectorId.toString());
+
+        // Verify that deleteById method was called with the correct sector id
+        verify(sectorRepository).deleteById(sectorId);
+    }
+
+    @Test
+    @DisplayName("[DELETE] Given a non-existent sector id, the method should not throw an exception and should not delete any sector.")
+    public void test_non_existent_sector_id() {
+        UUID sectorId = UUID.randomUUID();
+
+        // Stub findById method to return empty optional
+        when(sectorRepository.findById(sectorId)).thenReturn(Optional.empty());
+
+        // Call delete method
+        assertThrows(ResponseStatusException.class, () -> sectorService.delete(sectorId.toString()));
+
+        // Verify that deleteById method was not called
+        verify(sectorRepository, never()).deleteById(any(UUID.class));
+    }
+
+    // Given a null sector id, the method should throw an IllegalArgumentException.
+    @Test
+    @DisplayName("[DELETE] Given a null sector id, the method should throw an IllegalArgumentException.")
+    public void test_null_sector_id() {
+        // Call delete method with null sector id
+        assertThrows(ResponseStatusException.class, () -> sectorService.delete(null));
+
+        // Verify that deleteById method was not called
+        verify(sectorRepository, never()).deleteById(any(UUID.class));
+    }
+
+    // Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.
+    @Test
+    @DisplayName("[DELETE] Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.")
+    public void test_invalid_sector_id() {
+        // Call delete method with invalid sector id
+        assertThrows(ResponseStatusException.class, () -> sectorService.delete("invalid_id"));
+
+        // Verify that deleteById method was not called
+        verify(sectorRepository, never()).deleteById(any(UUID.class));
+    }
+
+
 }
 
 
