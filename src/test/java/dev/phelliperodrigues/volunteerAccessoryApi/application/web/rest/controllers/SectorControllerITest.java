@@ -539,4 +539,34 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value("404"));
     }
 
+    @Test
+    @DisplayName("[DELETE] Should return Not Found")
+    void deleteNotFound() throws Exception {
+        var uuid = UUID.randomUUID();
+        BDDMockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"))
+                .doNothing().when(sectorService).delete(uuid.toString());
+        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value("404"));
+    }
+
+    @Test
+    @DisplayName("[DELETE] Should delete sector")
+    void delete() throws Exception {
+        var uuid = UUID.randomUUID();
+        BDDMockito.doNothing().when(sectorService).delete(uuid.toString());
+        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
 }
