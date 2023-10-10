@@ -98,7 +98,7 @@ class SectorTest {
         sector.update(updatedSector);
 
         // Assert
-        assertNull(sector.getId());
+        assertEquals(id, sector.getId());
         assertNull(sector.getName());
         assertNull(sector.getObservations());
         assertNull(sector.getActive());
