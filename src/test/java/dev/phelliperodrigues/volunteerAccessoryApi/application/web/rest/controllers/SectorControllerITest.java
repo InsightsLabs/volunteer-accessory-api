@@ -27,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -340,4 +341,202 @@ class SectorControllerITest {
 
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content[0]").doesNotExist());
     }
+
+
+    @Test
+    @DisplayName("[UPDATE] Should update with success")
+    void update() throws Exception {
+        var request = SectorRequest.builder()
+                .name(faker.company().industry())
+                .observations(faker.lorem().paragraph())
+                .active(faker.bool().bool())
+                .build();
+        var uuid = UUID.randomUUID();
+        var sector = request.toSector();
+        BDDMockito.given(sectorService.update(sector, uuid.toString()))
+                .willReturn(Sector.builder()
+                        .id(uuid)
+                        .name(request.getName())
+                        .observations(request.getObservations())
+                        .active(request.isActive())
+                        .createUserId(UUID.randomUUID())
+                        .updateUserId(UUID.randomUUID())
+                        .build());
+
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should create a valid sector without observation")
+    void updateWithoutObservation() throws Exception {
+        var request = SectorRequest.builder()
+                .name(faker.company().industry())
+                .active(faker.bool().bool())
+                .build();
+        var uuid = UUID.randomUUID();
+        var sector = request.toSector();
+        BDDMockito.given(sectorService.update(sector, uuid.toString()))
+                .willReturn(Sector.builder()
+                        .id(UUID.randomUUID())
+                        .name(request.getName())
+                        .observations(request.getObservations())
+                        .active(request.isActive())
+                        .createUserId(UUID.randomUUID())
+                        .updateUserId(UUID.randomUUID())
+                        .build());
+
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should update a valid sector without active and observation")
+    void updateWithoutObservationAndActiveParam() throws Exception {
+        var request = SectorRequest.builder()
+                .name(faker.company().industry())
+                .build();
+        var uuid = UUID.randomUUID();
+        var sector = request.toSector();
+        BDDMockito.given(sectorService.update(sector, uuid.toString()))
+                .willReturn(Sector.builder()
+                        .id(uuid)
+                        .name(request.getName())
+                        .observations(request.getObservations())
+                        .active(request.isActive())
+                        .createUserId(UUID.randomUUID())
+                        .updateUserId(UUID.randomUUID())
+                        .build());
+
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should return bad request if name is null")
+    void updateBadRequestWithoutName() throws Exception {
+
+        var request = SectorRequest.builder()
+                .name(null)
+                .build();
+        var uuid = UUID.randomUUID();
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should return bad request if name is empty")
+    void updateBadRequestEmptyName() throws Exception {
+
+
+        var request = SectorRequest.builder()
+                .name("")
+                .build();
+        var uuid = UUID.randomUUID();
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should return bad request if without name")
+    void updateWithoutName() throws Exception {
+
+        var request = SectorRequest.builder()
+                .observations(faker.lorem().paragraph())
+                .active(faker.bool().bool())
+                .build();
+
+        var uuid = UUID.randomUUID();
+        var json = new ObjectMapper().writeValueAsString(request);
+
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+    }
+
+    @Test
+    @DisplayName("[UPDATE] Should return Not Found")
+    void updateNotFound() throws Exception {
+        var request = SectorRequest.builder()
+                .name(faker.company().industry())
+                .build();
+        var uuid = UUID.randomUUID();
+        var json = new ObjectMapper().writeValueAsString(request);
+        BDDMockito.given(sectorService.update(request.toSector(), uuid.toString()))
+                .willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
+        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("status").value("Not Found"))
+                .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value("404"));
+    }
+
 }

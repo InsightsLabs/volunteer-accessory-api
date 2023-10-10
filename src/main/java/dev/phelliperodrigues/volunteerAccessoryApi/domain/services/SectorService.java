@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromStrg;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,17 +28,17 @@ public class SectorService {
     }
 
     public Sector findById(String id) {
-        try {
-            return sectorRepository.findById(dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromString(id))
-                    .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
-
-        } catch (IllegalArgumentException ex) {
-            throw Exceptions.invalidIdException(id);
-        }
+        var uuid = fromStrg(id);
+        return sectorRepository.findById(uuid)
+                .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
     }
 
     public Page<Sector> findAllBy(Sector sector, Pageable pageable) {
         log.info("find all sector by: {}", sector);
         return sectorRepository.findAllBy(sector, pageable);
+    }
+
+    public Sector update(Sector request, String id) {
+        return null;
     }
 }
