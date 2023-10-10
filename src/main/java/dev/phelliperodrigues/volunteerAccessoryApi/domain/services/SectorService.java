@@ -53,4 +53,11 @@ public class SectorService {
         log.info("Sector {} updated", save.getId());
         return save;
     }
+
+    public void delete(String id) {
+        var found = findById(id);
+        sectorRepository.deleteById(found.getId());
+        log.info("Sector {} deleted", id);
+        
+    }
 }

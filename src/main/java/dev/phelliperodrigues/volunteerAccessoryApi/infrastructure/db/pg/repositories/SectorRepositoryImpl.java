@@ -58,4 +58,9 @@ public class SectorRepositoryImpl implements SectorRepository {
                 sectorEntityRepository.findAll(specification, pageable).map(SectorEntity::toSector)
         );
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        sectorEntityRepository.deleteById(id);
+    }
 }
