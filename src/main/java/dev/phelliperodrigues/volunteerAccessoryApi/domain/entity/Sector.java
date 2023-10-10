@@ -21,7 +21,17 @@ public class Sector {
 
 
     public boolean isActive() {
+        if (this.active == null)
+            return false;
         return this.active;
+    }
+
+    public void update(Sector sector) {
+        this.id = sector.getId();
+        this.name = sector.getName();
+        this.observations = sector.getObservations();
+        this.active = sector.getActive();
+        this.updateUserId = sector.getUpdateUserId();
     }
 
     public static class SectorBuilder {
