@@ -61,6 +61,8 @@ public class SectorEntity {
                 .name(this.name)
                 .observations(this.observations)
                 .active(this.active)
+                .createUserId(this.createUserId)
+                .updateUserId(this.updateUserId)
                 .build();
     }
 }
