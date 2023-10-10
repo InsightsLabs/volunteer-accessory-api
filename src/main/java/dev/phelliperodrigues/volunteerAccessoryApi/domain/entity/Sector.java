@@ -29,7 +29,6 @@ public class Sector {
     }
 
     public void update(Sector sector) {
-        this.id = sector.getId();
         this.name = sector.getName();
         this.observations = sector.getObservations();
         this.active = sector.getActive();
