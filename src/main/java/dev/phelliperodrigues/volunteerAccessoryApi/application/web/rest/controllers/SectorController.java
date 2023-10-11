@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -166,6 +167,26 @@ public class SectorController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String id) {
         sectorService.delete(id);
+    }
+
+    @Operation(
+            summary = "Deletar um setor pelo ID",
+            description = "Endpoint para deletar setor",
+            tags = {"Setor"}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "403", description = "Proibido", content = {@Content(schema = @Schema(implementation = ErrorDefault.class), mediaType = "application/json")}),
+    })
+    @Transactional
+    @DeleteMapping(value = "/all")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll(@RequestBody List<String> ids) {
+        sectorService.deleteAll(ids);
     }
 
 

@@ -12,15 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,8 +30,6 @@ class SectorServiceTest {
 
     @Mock
     private SectorRepository sectorRepository;
-    @Mock
-    Logger log;
 
     @InjectMocks
     private SectorService sectorService;
@@ -122,9 +117,9 @@ class SectorServiceTest {
 
         Assertions.assertNotNull(result);
         org.assertj.core.api.Assertions.assertThat(result.getContent()).isNotEmpty();
-        assertEquals(sector.getName(), result.getContent().stream().findFirst().get().getName());
-        assertEquals(sector.getObservations(), result.getContent().stream().findFirst().get().getObservations());
-        assertEquals(sector.isActive(), result.getContent().stream().findFirst().get().isActive());
+        assertEquals(sector.getName(), result.getContent().stream().findFirst().map(Sector::getName).orElse(null));
+        assertEquals(sector.getObservations(), result.getContent().stream().findFirst().map(Sector::getObservations).orElse(null));
+        assertEquals(sector.isActive(), result.getContent().stream().findFirst().map(Sector::isActive).orElse(null));
         verify(sectorRepository, times(1)).findAllBy(Mockito.any(), Mockito.any());
     }
 
@@ -147,7 +142,6 @@ class SectorServiceTest {
     @Test
     @DisplayName("[UPDATE] Should update the sector with successfully updated")
     void test_update_returnsUpdatedSector() {
-        // Arrange
         var id = UUID.randomUUID();
         var sector = Sector.builder()
                 .id(id)
@@ -164,10 +158,8 @@ class SectorServiceTest {
         when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
         when(sectorRepository.save(any())).thenReturn(updatedSector);
 
-        // Act
         var result = sectorService.update(updatedSector, id.toString());
 
-        // Assert
         assertEquals(updatedSector, result);
         verify(sectorRepository, times(1)).findById(id);
         verify(sectorRepository, times(1)).save(updatedSector);
@@ -176,20 +168,17 @@ class SectorServiceTest {
     @Test
     @DisplayName("[UPDATE] Should handle exception ResponseStatusException from NotFound when not match sector by id")
     void test_update_throwsNotFoundException() {
-        // Arrange
         UUID id = UUID.randomUUID();
         String sectorId = id.toString();
 
         when(sectorRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(ResponseStatusException.class, () -> sectorService.update(new Sector(), sectorId));
     }
 
     @Test
     @DisplayName("[UPDATE] Should update name with passed value and observation with null")
     void test_update_updatesOnlyPresentFields() {
-        // Arrange
         UUID id = UUID.randomUUID();
         Sector sector = Sector.builder()
                 .id(id)
@@ -206,10 +195,8 @@ class SectorServiceTest {
         when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
         when(sectorRepository.save(any())).thenReturn(updatedSector);
 
-        // Act
         Sector result = sectorService.update(updatedSector, sectorId);
 
-        // Assert
         assertEquals(updatedSector.getName(), result.getName());
         assertNull(result.getObservations());
         assertFalse(result.isActive());
@@ -217,10 +204,8 @@ class SectorServiceTest {
         verify(sectorRepository, times(1)).save(updatedSector);
     }
 
-    // Does not update the id field.
     @Test
     void test_update_doesNotUpdateIdField() {
-        // Arrange
         UUID id = UUID.randomUUID();
         Sector sector = Sector.builder()
                 .id(id)
@@ -239,32 +224,25 @@ class SectorServiceTest {
         when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
         when(sectorRepository.save(any())).thenReturn(updatedSector);
 
-        // Act
         Sector result = sectorService.update(updatedSector, sectorId);
 
-        // Assert
         assertEquals(id, result.getId());
         verify(sectorRepository, times(1)).findById(id);
         verify(sectorRepository, times(1)).save(updatedSector);
     }
 
 
-    // Given a valid sector id, the method should delete the sector from the database.
     @Test
     @DisplayName("[DELETE] Given a valid sector id, the method should delete the sector from the database.")
     public void test_valid_sector_id() {
-        // Mock dependencies
         UUID sectorId = UUID.randomUUID();
         Sector sector = new Sector();
         sector.setId(sectorId);
 
-        // Stub findById method
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
 
-        // Call delete method
         sectorService.delete(sectorId.toString());
 
-        // Verify that deleteById method was called with the correct sector id
         verify(sectorRepository).deleteById(sectorId);
     }
 
@@ -273,36 +251,137 @@ class SectorServiceTest {
     public void test_non_existent_sector_id() {
         UUID sectorId = UUID.randomUUID();
 
-        // Stub findById method to return empty optional
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.empty());
 
-        // Call delete method
         assertThrows(ResponseStatusException.class, () -> sectorService.delete(sectorId.toString()));
 
-        // Verify that deleteById method was not called
-        verify(sectorRepository, never()).deleteById(any(UUID.class));
+        verify(sectorRepository, never()).deleteById(any());
     }
 
-    // Given a null sector id, the method should throw an IllegalArgumentException.
     @Test
     @DisplayName("[DELETE] Given a null sector id, the method should throw an IllegalArgumentException.")
     public void test_null_sector_id() {
-        // Call delete method with null sector id
         assertThrows(ResponseStatusException.class, () -> sectorService.delete(null));
 
-        // Verify that deleteById method was not called
-        verify(sectorRepository, never()).deleteById(any(UUID.class));
+        verify(sectorRepository, never()).deleteById(any());
     }
 
-    // Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.
     @Test
     @DisplayName("[DELETE] Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.")
     public void test_invalid_sector_id() {
-        // Call delete method with invalid sector id
         assertThrows(ResponseStatusException.class, () -> sectorService.delete("invalid_id"));
 
-        // Verify that deleteById method was not called
-        verify(sectorRepository, never()).deleteById(any(UUID.class));
+        verify(sectorRepository, never()).deleteById(any());
+    }
+
+
+    @Test
+    @DisplayName("[DELETE ALL] Delete all sectors in the list")
+    public void test_deleteAll_deleteAllSectors() {
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        List<Sector> sectors = ids.stream()
+                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+                .toList();
+
+        Mockito.when(sectorRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(sectors.get(0)))
+                .thenReturn(Optional.of(sectors.get(1)))
+                .thenReturn(Optional.of(sectors.get(2)));
+        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("[DELETE ALL] Delete an empty list of sectors")
+    public void test_deleteAll_deleteEmptyList() {
+        List<String> ids = Collections.emptyList();
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.never()).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.never()).deleteById(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("[DELETE ALL] Attempt to delete a non-existent sector")
+    public void test_deleteAll_deleteNonExistentSector() {
+
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
+
+        Mockito.when(sectorRepository.findById(Mockito.any()))
+                .thenReturn(Optional.empty());
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.never()).deleteById(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("[DELETE ALL] Attempt to delete a sector with an invalid id")
+    public void test_deleteAll_deleteInvalidId() {
+
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
+        List<Sector> sectors = ids.stream().filter(id -> !id.equals("invalid"))
+                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+                .toList();
+
+        Mockito.when(sectorRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(sectors.get(0)))
+                .thenReturn(Optional.of(sectors.get(1)))
+                .thenThrow(new IllegalArgumentException());
+
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(2)).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(2)).deleteById(Mockito.any());
+    }
+
+    @Test
+    public void test_correct_number_of_sectors_deleted() {
+
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        List<Sector> sectors = ids.stream()
+                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+                .toList();
+
+
+        Mockito.when(sectorRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(sectors.get(0)))
+                .thenReturn(Optional.of(sectors.get(1)))
+                .thenReturn(Optional.of(sectors.get(2)));
+        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
+    }
+
+    @Test
+    public void test_delete_method_called_for_each_sector_id() {
+
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        List<Sector> sectors = ids.stream()
+                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+                .toList();
+
+
+        Mockito.when(sectorRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(sectors.get(0)))
+                .thenReturn(Optional.of(sectors.get(1)))
+                .thenReturn(Optional.of(sectors.get(2)));
+        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
     }
 
 

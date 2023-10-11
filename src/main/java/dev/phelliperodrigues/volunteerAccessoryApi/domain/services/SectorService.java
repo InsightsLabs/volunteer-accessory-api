@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromStrg;
@@ -58,6 +59,16 @@ public class SectorService {
         var found = findById(id);
         sectorRepository.deleteById(found.getId());
         log.info("Sector {} deleted", id);
-        
+
+    }
+
+    public void deleteAll(List<String> ids) {
+        for (var id : ids) {
+            try {
+                delete(id);
+            } catch (Exception ex) {
+                log.error("Error deleting id {}", id, ex);
+            }
+        }
     }
 }

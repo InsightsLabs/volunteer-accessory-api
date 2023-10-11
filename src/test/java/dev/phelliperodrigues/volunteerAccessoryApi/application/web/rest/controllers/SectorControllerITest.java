@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ class SectorControllerITest {
 
     @Autowired
     private MockMvc mvc;
-
+    
     @MockBean
     SectorService sectorService;
 
@@ -569,4 +570,19 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
+    @Test
+    @DisplayName("[DELETE ALL] Should delete all sector")
+    void deleteAll() throws Exception {
+        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
+        BDDMockito.doNothing().when(sectorService).deleteAll(ids);
+        var json = new ObjectMapper().writeValueAsString(ids);
+
+        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/all")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(response)
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 }
