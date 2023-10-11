@@ -156,6 +156,9 @@
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/handlers/**
                         </exclude>
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/infrastructure/**</exclude>
+                        <exclude>
+                            **/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/interceptors/**
+                        </exclude>
                     </excludes>
                 </configuration>
                 <executions>
