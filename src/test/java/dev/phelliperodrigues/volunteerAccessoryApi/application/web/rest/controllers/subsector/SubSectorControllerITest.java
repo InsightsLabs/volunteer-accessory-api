@@ -130,7 +130,7 @@ class SubSectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/subsectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -168,7 +168,7 @@ class SubSectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/subsectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -192,8 +192,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
@@ -217,8 +218,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
@@ -241,8 +243,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
@@ -438,7 +441,7 @@ class SubSectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -475,7 +478,7 @@ class SubSectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -497,8 +500,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
@@ -521,8 +525,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
@@ -546,8 +551,9 @@ class SubSectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "sector")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors.size()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[*].defaultMessage", containsInAnyOrder("O campo \"nome\" é obrigatório", "O sub setor precisa conter um setor valido")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 

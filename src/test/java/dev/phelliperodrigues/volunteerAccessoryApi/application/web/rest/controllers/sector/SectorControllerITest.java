@@ -47,7 +47,7 @@ class SectorControllerITest {
 
     @Autowired
     private MockMvc mvc;
-    
+
     @MockBean
     private SectorService sectorService;
 
@@ -119,7 +119,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -153,7 +153,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -409,7 +409,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -442,7 +442,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
