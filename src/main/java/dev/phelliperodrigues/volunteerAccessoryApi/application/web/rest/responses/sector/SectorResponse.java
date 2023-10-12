@@ -1,6 +1,7 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +13,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectorResponse {
     private UUID id;
     private String name;
     private String observations;
-    private boolean active;
+    private Boolean active;
 
 
     public static SectorResponse build(Sector sector) {
@@ -24,7 +26,7 @@ public class SectorResponse {
                 .id(sector.getId())
                 .name(sector.getName())
                 .observations(sector.getObservations())
-                .active(sector.isActive())
+                .active(sector.getActive())
                 .build();
     }
 }

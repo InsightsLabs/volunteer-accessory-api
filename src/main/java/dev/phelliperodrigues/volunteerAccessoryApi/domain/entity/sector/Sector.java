@@ -1,10 +1,12 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.domain.entity;
+package dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector;
 
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromStrg;
@@ -20,6 +22,7 @@ public class Sector {
     private Boolean active;
     private UUID createUserId;
     private UUID updateUserId;
+    private Set<SubSector> subSectors;
 
 
     public boolean isActive() {

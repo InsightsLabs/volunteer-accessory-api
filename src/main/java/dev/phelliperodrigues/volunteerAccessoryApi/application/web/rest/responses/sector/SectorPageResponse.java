@@ -1,11 +1,13 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectorPageResponse {
     List<SectorResponse> content;
     CustomPageable pageable;

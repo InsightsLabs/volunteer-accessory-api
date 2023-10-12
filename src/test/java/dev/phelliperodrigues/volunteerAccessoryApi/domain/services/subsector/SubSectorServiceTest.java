@@ -1,8 +1,9 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.domain.services;
+package dev.phelliperodrigues.volunteerAccessoryApi.domain.services.subsector;
 
 import com.github.javafaker.Faker;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRepository;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.subsector.SubSectorRepository;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,58 +24,58 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SectorServiceTest {
+class SubSectorServiceTest {
 
     private final Faker faker = FakerUtil.getInstance();
 
 
     @Mock
-    private SectorRepository sectorRepository;
+    private SubSectorRepository sectorRepository;
 
     @InjectMocks
-    private SectorService sectorService;
+    private SubSectorService sectorService;
 
 
     @Test
-    @DisplayName("[create()] Should create sector with success")
+    @DisplayName("[create()] Should create with success")
     void create() {
 
-        var sector = buildSector();
+        var subSector = buildSubSector();
 
-        when(sectorRepository.save(Mockito.any())).thenReturn(sector);
+        when(sectorRepository.save(Mockito.any())).thenReturn(subSector);
 
-        var sectorCreated = sectorService.create(sector);
+        var saved = sectorService.create(subSector);
 
-        Assertions.assertNotNull(sectorCreated);
-        Assertions.assertNotNull(sectorCreated.getId());
-        assertEquals(sector.getName(), sectorCreated.getName());
-        assertEquals(sector.getObservations(), sectorCreated.getObservations());
-        assertEquals(sector.isActive(), sectorCreated.isActive());
+        Assertions.assertNotNull(saved);
+        Assertions.assertNotNull(saved.getId());
+        assertEquals(subSector.getName(), saved.getName());
+        assertEquals(subSector.getObservations(), saved.getObservations());
+        assertEquals(subSector.isActive(), saved.isActive());
         verify(sectorRepository, times(1)).save(Mockito.any());
 
     }
 
     @Test
-    @DisplayName("[findById()] Should return a sector with success")
+    @DisplayName("[findById()] Should return with success")
     void findById() {
 
-        var sector = buildSector();
-        when(sectorRepository.findById(Mockito.any())).thenReturn(Optional.of(sector));
+        var subSector = buildSubSector();
+        when(sectorRepository.findById(Mockito.any())).thenReturn(Optional.of(subSector));
 
         var result = sectorService.findById(UUID.randomUUID().toString());
 
 
         Assertions.assertNotNull(result);
         Assertions.assertNotNull(result.getId());
-        assertEquals(sector.getName(), result.getName());
-        assertEquals(sector.getObservations(), result.getObservations());
-        assertEquals(sector.isActive(), result.isActive());
+        assertEquals(subSector.getName(), result.getName());
+        assertEquals(subSector.getObservations(), result.getObservations());
+        assertEquals(subSector.isActive(), result.isActive());
         verify(sectorRepository, times(1)).findById(Mockito.any());
 
     }
 
     @Test
-    @DisplayName("[findById()] Should handle exception ResponseStatusException from NotFound when not match sector by id")
+    @DisplayName("[findById()] Should handle exception ResponseStatusException from NotFound when not match by id")
     void findByIdNotFound() {
         when(sectorRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
@@ -96,37 +97,28 @@ class SectorServiceTest {
 
     }
 
-    private Sector buildSector() {
-        return Sector.builder()
-                .id(UUID.randomUUID())
-                .name(faker.company().industry())
-                .observations(faker.lorem().sentence(10))
-                .active(faker.bool().bool())
-                .build();
-    }
-
     @Test
-    @DisplayName("[findAllBy] Should return all sector by terms")
+    @DisplayName("[findAllBy] Should return all by terms")
     void findAllBy() {
-        var sector = buildSector();
-        when(sectorRepository.findAllBy(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of(sector)));
+        var subSector = buildSubSector();
+        when(sectorRepository.findAllBy(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of(subSector)));
 
 
-        var result = sectorService.findAllBy(sector, Pageable.unpaged());
+        var result = sectorService.findAllBy(subSector, Pageable.unpaged());
 
 
         Assertions.assertNotNull(result);
         org.assertj.core.api.Assertions.assertThat(result.getContent()).isNotEmpty();
-        assertEquals(sector.getName(), result.getContent().stream().findFirst().map(Sector::getName).orElse(null));
-        assertEquals(sector.getObservations(), result.getContent().stream().findFirst().map(Sector::getObservations).orElse(null));
-        assertEquals(sector.isActive(), result.getContent().stream().findFirst().map(Sector::isActive).orElse(null));
+        assertEquals(subSector.getName(), result.getContent().stream().findFirst().map(SubSector::getName).orElse(null));
+        assertEquals(subSector.getObservations(), result.getContent().stream().findFirst().map(SubSector::getObservations).orElse(null));
+        assertEquals(subSector.isActive(), result.getContent().stream().findFirst().map(SubSector::isActive).orElse(null));
         verify(sectorRepository, times(1)).findAllBy(Mockito.any(), Mockito.any());
     }
 
     @Test
-    @DisplayName("[findAllBy] Should return empty sectors by terms")
+    @DisplayName("[findAllBy] Should return empty by terms")
     void findAllByEmpty() {
-        var sector = buildSector();
+        var sector = buildSubSector();
         when(sectorRepository.findAllBy(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of()));
 
 
@@ -140,103 +132,103 @@ class SectorServiceTest {
 
 
     @Test
-    @DisplayName("[UPDATE] Should update the sector with successfully updated")
-    void test_update_returnsUpdatedSector() {
+    @DisplayName("[UPDATE] Should update with successfully updated")
+    void test_update_returnsUpdatedSubSector() {
         var id = UUID.randomUUID();
-        var sector = Sector.builder()
+        var subSector = SubSector.builder()
                 .id(id)
-                .name("Test Sector")
+                .name("Test SubSector")
                 .observations("Test Observations")
                 .active(true)
                 .build();
-        var updatedSector = Sector.builder()
+        var updatedSubSector = SubSector.builder()
                 .id(id)
-                .name("Updated Sector")
+                .name("Updated SubSector")
                 .observations("Updated Observations")
                 .active(false)
                 .build();
-        when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
-        when(sectorRepository.save(any())).thenReturn(updatedSector);
+        when(sectorRepository.findById(id)).thenReturn(Optional.of(subSector));
+        when(sectorRepository.save(any())).thenReturn(updatedSubSector);
 
-        var result = sectorService.update(updatedSector, id.toString());
+        var result = sectorService.update(updatedSubSector, id.toString());
 
-        assertEquals(updatedSector, result);
+        assertEquals(updatedSubSector, result);
         verify(sectorRepository, times(1)).findById(id);
-        verify(sectorRepository, times(1)).save(updatedSector);
+        verify(sectorRepository, times(1)).save(updatedSubSector);
     }
 
     @Test
-    @DisplayName("[UPDATE] Should handle exception ResponseStatusException from NotFound when not match sector by id")
+    @DisplayName("[UPDATE] Should handle exception ResponseStatusException from NotFound when not match by id")
     void test_update_throwsNotFoundException() {
         UUID id = UUID.randomUUID();
         String sectorId = id.toString();
 
         when(sectorRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> sectorService.update(new Sector(), sectorId));
+        assertThrows(ResponseStatusException.class, () -> sectorService.update(new SubSector(), sectorId));
     }
 
     @Test
     @DisplayName("[UPDATE] Should update name with passed value and observation with null")
     void test_update_updatesOnlyPresentFields() {
         UUID id = UUID.randomUUID();
-        Sector sector = Sector.builder()
+        SubSector subSector = SubSector.builder()
                 .id(id)
-                .name("Test Sector")
+                .name("Test SubSector")
                 .observations("Test Observations")
                 .active(true)
                 .build();
-        Sector updatedSector = Sector.builder()
+        SubSector updatedSubSector = SubSector.builder()
                 .id(id)
-                .name("Updated Sector")
+                .name("Updated SubSector")
                 .build();
         String sectorId = id.toString();
 
-        when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
-        when(sectorRepository.save(any())).thenReturn(updatedSector);
+        when(sectorRepository.findById(id)).thenReturn(Optional.of(subSector));
+        when(sectorRepository.save(any())).thenReturn(updatedSubSector);
 
-        Sector result = sectorService.update(updatedSector, sectorId);
+        SubSector result = sectorService.update(updatedSubSector, sectorId);
 
-        assertEquals(updatedSector.getName(), result.getName());
+        assertEquals(updatedSubSector.getName(), result.getName());
         assertNull(result.getObservations());
         assertFalse(result.isActive());
         verify(sectorRepository, times(1)).findById(id);
-        verify(sectorRepository, times(1)).save(updatedSector);
+        verify(sectorRepository, times(1)).save(updatedSubSector);
     }
 
     @Test
     void test_update_doesNotUpdateIdField() {
         UUID id = UUID.randomUUID();
-        Sector sector = Sector.builder()
+        SubSector sector = SubSector.builder()
                 .id(id)
-                .name("Test Sector")
+                .name("Test SubSector")
                 .observations("Test Observations")
                 .active(true)
                 .build();
-        Sector updatedSector = Sector.builder()
+        SubSector updatedSubSector = SubSector.builder()
                 .id(id)
-                .name("Updated Sector")
+                .name("Updated SubSector")
                 .observations("Updated Observations")
                 .active(false)
                 .build();
         String sectorId = id.toString();
 
         when(sectorRepository.findById(id)).thenReturn(Optional.of(sector));
-        when(sectorRepository.save(any())).thenReturn(updatedSector);
+        when(sectorRepository.save(any())).thenReturn(updatedSubSector);
 
-        Sector result = sectorService.update(updatedSector, sectorId);
+        SubSector result = sectorService.update(updatedSubSector, sectorId);
 
         assertEquals(id, result.getId());
         verify(sectorRepository, times(1)).findById(id);
-        verify(sectorRepository, times(1)).save(updatedSector);
+        verify(sectorRepository, times(1)).save(updatedSubSector);
     }
 
 
     @Test
-    @DisplayName("[DELETE] Given a valid sector id, the method should delete the sector from the database.")
+    @DisplayName("[DELETE] Given a valid id, the method should delete from the database.")
     public void test_valid_sector_id() {
         UUID sectorId = UUID.randomUUID();
-        Sector sector = new Sector();
+        SubSector sector = new SubSector();
         sector.setId(sectorId);
 
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
@@ -247,7 +239,7 @@ class SectorServiceTest {
     }
 
     @Test
-    @DisplayName("[DELETE] Given a non-existent sector id, the method should not throw an exception and should not delete any sector.")
+    @DisplayName("[DELETE] Given a non-existent id, the method should not throw an exception and should not delete any sector.")
     public void test_non_existent_sector_id() {
         UUID sectorId = UUID.randomUUID();
 
@@ -259,7 +251,7 @@ class SectorServiceTest {
     }
 
     @Test
-    @DisplayName("[DELETE] Given a null sector id, the method should throw an IllegalArgumentException.")
+    @DisplayName("[DELETE] Given a null id, the method should throw an IllegalArgumentException.")
     public void test_null_sector_id() {
         assertThrows(ResponseStatusException.class, () -> sectorService.delete(null));
 
@@ -267,7 +259,7 @@ class SectorServiceTest {
     }
 
     @Test
-    @DisplayName("[DELETE] Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.")
+    @DisplayName("[DELETE] Given an invalid id (not a UUID), the method should throw an IllegalArgumentException.")
     public void test_invalid_sector_id() {
         assertThrows(ResponseStatusException.class, () -> sectorService.delete("invalid_id"));
 
@@ -277,10 +269,10 @@ class SectorServiceTest {
 
     @Test
     @DisplayName("[DELETE ALL] Delete all sectors in the list")
-    public void test_deleteAll_deleteAllSectors() {
+    public void test_deleteAll_deleteAllSubSectors() {
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+        List<SubSector> sectors = ids.stream()
+                .map(id -> SubSector.builder().id(UUID.fromString(id)).name("SubSector " + id).build())
                 .toList();
 
         Mockito.when(sectorRepository.findById(Mockito.any()))
@@ -308,7 +300,7 @@ class SectorServiceTest {
 
     @Test
     @DisplayName("[DELETE ALL] Attempt to delete a non-existent sector")
-    public void test_deleteAll_deleteNonExistentSector() {
+    public void test_deleteAll_deleteNonExistentSubSector() {
 
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
@@ -322,12 +314,12 @@ class SectorServiceTest {
     }
 
     @Test
-    @DisplayName("[DELETE ALL] Attempt to delete a sector with an invalid id")
+    @DisplayName("[DELETE ALL] Attempt to delete a with an invalid id")
     public void test_deleteAll_deleteInvalidId() {
 
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream().filter(id -> !id.equals("invalid"))
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+        List<SubSector> sectors = ids.stream().filter(id -> !id.equals("invalid"))
+                .map(id -> SubSector.builder().id(UUID.fromString(id)).name("SubSector " + id).build())
                 .toList();
 
         Mockito.when(sectorRepository.findById(Mockito.any()))
@@ -346,8 +338,8 @@ class SectorServiceTest {
     public void test_correct_number_of_sectors_deleted() {
 
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+        List<SubSector> sectors = ids.stream()
+                .map(id -> SubSector.builder().id(UUID.fromString(id)).name("SubSector " + id).build())
                 .toList();
 
 
@@ -367,8 +359,8 @@ class SectorServiceTest {
     public void test_delete_method_called_for_each_sector_id() {
 
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
+        List<SubSector> sectors = ids.stream()
+                .map(id -> SubSector.builder().id(UUID.fromString(id)).name("SubSector " + id).build())
                 .toList();
 
 
@@ -382,6 +374,18 @@ class SectorServiceTest {
 
         Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
         Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
+    }
+
+    private SubSector buildSubSector() {
+        return SubSector.builder()
+                .id(UUID.randomUUID())
+                .name(faker.company().industry())
+                .observations(faker.lorem().sentence(10))
+                .active(faker.bool().bool())
+                .sector(Sector.builder()
+                        .id(UUID.randomUUID())
+                        .build())
+                .build();
     }
 
 

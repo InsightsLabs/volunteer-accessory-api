@@ -1,11 +1,13 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.subsector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplication;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.subsector.SubSectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.subsector.SubSectorService;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -33,47 +35,52 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SUB_SECTOR_API;
 import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest(controllers = SectorController.class)
+@WebMvcTest(controllers = SubSectorController.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = VolunteerAccessoryApiApplication.class)
-class SectorControllerITest {
+class SubSectorControllerITest {
 
     private final Faker faker = FakerUtil.getInstance();
 
     @Autowired
     private MockMvc mvc;
-    
+
     @MockBean
-    SectorService sectorService;
+    private SubSectorService service;
 
 
     @Test
     @DisplayName("[CREATE] Should create a valid and active sector")
     void shouldCreateValidSector() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
+                .id(UUID.randomUUID())
                 .name(faker.company().industry())
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
+                .sector(buildSector())
                 .build();
 
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.create(sector))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.create(sector))
+                .willReturn(SubSector.builder()
                         .id(UUID.randomUUID())
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -81,7 +88,7 @@ class SectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().exists("Location"))
-                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
+                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/subsectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
@@ -91,24 +98,28 @@ class SectorControllerITest {
     @Test
     @DisplayName("[CREATE] Should create a valid sector without observation")
     void shouldCreateValidSectorWithoutObservation() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(faker.company().industry())
                 .active(faker.bool().bool())
+                .sector(buildSector())
                 .build();
 
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.create(sector))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.create(sector))
+                .willReturn(SubSector.builder()
                         .id(UUID.randomUUID())
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -116,7 +127,7 @@ class SectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().exists("Location"))
-                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
+                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/subsectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
@@ -126,23 +137,27 @@ class SectorControllerITest {
     @Test
     @DisplayName("[CREATE] Should create a valid sector without active and observation")
     void shouldCreateValidSectorWithoutActiveAndObservation() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(faker.company().industry())
+                .sector(buildSector())
                 .build();
 
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.create(sector))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.create(sector))
+                .willReturn(SubSector.builder()
                         .id(UUID.randomUUID())
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -150,7 +165,7 @@ class SectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.header().exists("Location"))
-                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
+                .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/subsectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
                 .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
@@ -161,7 +176,7 @@ class SectorControllerITest {
     @DisplayName("[CREATE] Should return bad request if name is null")
     void shouldReturnBadRequestIfNameIsNull() throws Exception {
 
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(null)
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
@@ -169,7 +184,7 @@ class SectorControllerITest {
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -179,14 +194,14 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
     @DisplayName("[CREATE] Should return bad request if name is empty")
     void shouldReturnBadRequestIfNameIsEmpty() throws Exception {
 
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name("")
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
@@ -194,7 +209,7 @@ class SectorControllerITest {
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -204,21 +219,21 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
     @DisplayName("[CREATE] Should return bad request if without name")
     void shouldReturnBadRequestIfWithoutName() throws Exception {
 
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
                 .build();
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.post(SECTOR_API)
+        var response = MockMvcRequestBuilders.post(SUB_SECTOR_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -228,22 +243,24 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
     @DisplayName("[FIND BY ID] Should return a sector with success")
     void findByIdWithSuccess() throws Exception {
         UUID uuid = UUID.randomUUID();
-        var sector = Sector.builder()
+        var sector = SubSector.builder()
                 .id(uuid)
                 .name(faker.company().industry())
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
-                .build();
-        BDDMockito.given(sectorService.findById(uuid.toString()))
+                .sector(Sector.builder()
+                        .id(buildSector().getId())
+                        .build()).build();
+        BDDMockito.given(service.findById(uuid.toString()))
                 .willReturn(sector);
-        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.get(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON);
 
         mvc.perform(response)
@@ -258,10 +275,10 @@ class SectorControllerITest {
     @DisplayName("[FIND BY ID] Should return bad request if ID is not valid")
     void findByIdBadRequest() throws Exception {
 
-        BDDMockito.given(sectorService.findById("123"))
+        BDDMockito.given(service.findById("123"))
                 .willThrow(Exceptions.invalidIdException("123"));
 
-        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+        var response = MockMvcRequestBuilders.get(SUB_SECTOR_API + "/" + "123")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mvc.perform(response)
@@ -277,10 +294,10 @@ class SectorControllerITest {
     @DisplayName("[FIND BY ID] Should return not found if not match ID")
     void findByIdNotFound() throws Exception {
 
-        BDDMockito.given(sectorService.findById("123"))
+        BDDMockito.given(service.findById("123"))
                 .willThrow(Exceptions.notFoundException("Setor não encontrado"));
 
-        var response = MockMvcRequestBuilders.get(SECTOR_API + "/" + "123")
+        var response = MockMvcRequestBuilders.get(SUB_SECTOR_API + "/" + "123")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mvc.perform(response)
@@ -293,20 +310,23 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("[FIND ALL BY] Should return with success all sectors match")
+    @DisplayName("[FIND ALL BY] Should return with success all subsectors match")
     void findAllBy() throws Exception {
         UUID uuid = UUID.randomUUID();
         var name = faker.company().industry();
         var isActive = faker.bool().bool();
-        var sector = Sector.builder()
+        var sector = SubSector.builder()
                 .id(uuid)
                 .name(name)
                 .observations(faker.lorem().paragraph())
                 .active(isActive)
+                .sector(Sector.builder()
+                        .id(UUID.randomUUID())
+                        .build())
                 .build();
-        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+        BDDMockito.given(service.findAllBy(Mockito.any(), Mockito.any()))
                 .willReturn(new PageImpl<>(List.of(sector)));
-        var response = MockMvcRequestBuilders.get(SECTOR_API)
+        var response = MockMvcRequestBuilders.get(SUB_SECTOR_API)
                 .queryParam("name", name)
                 .queryParam("active", String.valueOf(isActive))
                 .queryParam("id", uuid.toString())
@@ -322,15 +342,15 @@ class SectorControllerITest {
     }
 
     @Test
-    @DisplayName("[FIND ALL BY] Should return with success a empty list sectors")
+    @DisplayName("[FIND ALL BY] Should return with success a empty list subsectors")
     void findAllByEmpty() throws Exception {
         UUID uuid = UUID.randomUUID();
         var name = faker.company().industry();
         var isActive = faker.bool().bool();
 
-        BDDMockito.given(sectorService.findAllBy(Mockito.any(), Mockito.any()))
+        BDDMockito.given(service.findAllBy(Mockito.any(), Mockito.any()))
                 .willReturn(Page.empty());
-        var response = MockMvcRequestBuilders.get(SECTOR_API)
+        var response = MockMvcRequestBuilders.get(SUB_SECTOR_API)
                 .queryParam("name", name)
                 .queryParam("active", String.valueOf(isActive))
                 .queryParam("id", uuid.toString())
@@ -347,26 +367,31 @@ class SectorControllerITest {
     @Test
     @DisplayName("[UPDATE] Should update with success")
     void update() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
+                .id(UUID.randomUUID())
                 .name(faker.company().industry())
                 .observations(faker.lorem().paragraph())
                 .active(faker.bool().bool())
+                .sector(buildSector())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.update(sector, uuid.toString()))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.update(sector, uuid.toString()))
+                .willReturn(SubSector.builder()
                         .id(uuid)
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
                         .updateUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -382,25 +407,29 @@ class SectorControllerITest {
     @Test
     @DisplayName("[UPDATE] Should create a valid sector without observation")
     void updateWithoutObservation() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(faker.company().industry())
                 .active(faker.bool().bool())
+                .sector(buildSector())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.update(sector, uuid.toString()))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.update(sector, uuid.toString()))
+                .willReturn(SubSector.builder()
                         .id(UUID.randomUUID())
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
                         .updateUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -416,24 +445,28 @@ class SectorControllerITest {
     @Test
     @DisplayName("[UPDATE] Should update a valid sector without active and observation")
     void updateWithoutObservationAndActiveParam() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(faker.company().industry())
+                .sector(buildSector())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
-        BDDMockito.given(sectorService.update(sector, uuid.toString()))
-                .willReturn(Sector.builder()
+        var sector = request.toDomain();
+        BDDMockito.given(service.update(sector, uuid.toString()))
+                .willReturn(SubSector.builder()
                         .id(uuid)
                         .name(request.getName())
                         .observations(request.getObservations())
                         .active(request.isActive())
                         .createUserId(UUID.randomUUID())
                         .updateUserId(UUID.randomUUID())
+                        .sector(Sector.builder()
+                                .id(request.getSector().getId())
+                                .build())
                         .build());
 
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -450,13 +483,13 @@ class SectorControllerITest {
     @DisplayName("[UPDATE] Should return bad request if name is null")
     void updateBadRequestWithoutName() throws Exception {
 
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(null)
                 .build();
         var uuid = UUID.randomUUID();
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -466,7 +499,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
@@ -474,13 +507,13 @@ class SectorControllerITest {
     void updateBadRequestEmptyName() throws Exception {
 
 
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name("")
                 .build();
         var uuid = UUID.randomUUID();
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -490,7 +523,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
@@ -505,7 +538,7 @@ class SectorControllerITest {
         var uuid = UUID.randomUUID();
         var json = new ObjectMapper().writeValueAsString(request);
 
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -515,20 +548,22 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("message").value("validation error"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].defaultMessage").value("O campo \"nome\" é obrigatório"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("sectorRequest"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].objectName").value("subSectorRequest"));
     }
 
     @Test
     @DisplayName("[UPDATE] Should return Not Found")
     void updateNotFound() throws Exception {
-        var request = SectorRequest.builder()
+        var request = SubSectorRequest.builder()
                 .name(faker.company().industry())
+                .sector(buildSector())
+
                 .build();
         var uuid = UUID.randomUUID();
         var json = new ObjectMapper().writeValueAsString(request);
-        BDDMockito.given(sectorService.update(request.toSector(), uuid.toString()))
+        BDDMockito.given(service.update(request.toDomain(), uuid.toString()))
                 .willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
-        var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
+        var response = MockMvcRequestBuilders.put(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -545,8 +580,8 @@ class SectorControllerITest {
     void deleteNotFound() throws Exception {
         var uuid = UUID.randomUUID();
         BDDMockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"))
-                .doNothing().when(sectorService).delete(uuid.toString());
-        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/" + uuid)
+                .doNothing().when(service).delete(uuid.toString());
+        var response = MockMvcRequestBuilders.delete(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
@@ -561,8 +596,8 @@ class SectorControllerITest {
     @DisplayName("[DELETE] Should delete sector")
     void delete() throws Exception {
         var uuid = UUID.randomUUID();
-        BDDMockito.doNothing().when(sectorService).delete(uuid.toString());
-        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/" + uuid)
+        BDDMockito.doNothing().when(service).delete(uuid.toString());
+        var response = MockMvcRequestBuilders.delete(SUB_SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
@@ -574,10 +609,10 @@ class SectorControllerITest {
     @DisplayName("[DELETE ALL] Should delete all sector")
     void deleteAll() throws Exception {
         List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
-        BDDMockito.doNothing().when(sectorService).deleteAll(ids);
+        BDDMockito.doNothing().when(service).deleteAll(ids);
         var json = new ObjectMapper().writeValueAsString(ids);
 
-        var response = MockMvcRequestBuilders.delete(SECTOR_API + "/all")
+        var response = MockMvcRequestBuilders.delete(SUB_SECTOR_API + "/all")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -585,4 +620,16 @@ class SectorControllerITest {
         mvc.perform(response)
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
+
+
+    private SectorRequest buildSector() {
+
+        return SectorRequest.builder()
+                .id(UUID.randomUUID())
+                .name(faker.company().industry())
+                .observations(faker.lorem().paragraph())
+                .active(faker.bool().bool())
+                .build();
+    }
+
 }

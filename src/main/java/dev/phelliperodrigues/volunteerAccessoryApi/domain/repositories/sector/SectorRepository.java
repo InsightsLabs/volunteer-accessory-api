@@ -1,6 +1,6 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories;
+package dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.sector;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

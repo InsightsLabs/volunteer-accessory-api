@@ -2,6 +2,7 @@ package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handler
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.LogUtils.logError;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
+@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class MethodArgumentNotValidExceptionHandler {
@@ -25,6 +28,7 @@ public class MethodArgumentNotValidExceptionHandler {
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Error> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        logError(log, ex);
         BindingResult result = ex.getBindingResult();
         List<org.springframework.validation.FieldError> fieldErrors = result.getFieldErrors();
         return processFieldErrors(fieldErrors);
