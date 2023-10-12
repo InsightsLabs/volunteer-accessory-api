@@ -47,7 +47,7 @@ class SectorControllerITest {
 
     @Autowired
     private MockMvc mvc;
-
+    
     @MockBean
     private SectorService sectorService;
 
