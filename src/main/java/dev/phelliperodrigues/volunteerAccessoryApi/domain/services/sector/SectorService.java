@@ -1,7 +1,7 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.domain.services;
+package dev.phelliperodrigues.volunteerAccessoryApi.domain.services.sector;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRepository;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.sector.SectorRepository;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

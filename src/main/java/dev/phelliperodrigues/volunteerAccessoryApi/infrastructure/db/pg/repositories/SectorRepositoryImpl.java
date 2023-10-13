@@ -1,8 +1,8 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.repositories;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.SectorRepository;
-import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.SectorEntity;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.sector.SectorRepository;
+import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.sector.SectorEntity;
 import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.repositories.jpa.SectorEntityRepository;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.RestPage;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +22,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SectorRepositoryImpl implements SectorRepository {
 
-    private final SectorEntityRepository sectorEntityRepository;
+    private final SectorEntityRepository repository;
 
     @Override
     @CacheEvict(value = "sectors", allEntries = true)
     public Sector save(Sector sector) {
-        var sectorEntity = sectorEntityRepository.save(SectorEntity.from(sector));
-        return sectorEntity.toSector();
+        var sectorEntity = repository.save(SectorEntity.from(sector));
+        return sectorEntity.toDomain();
     }
 
     @Override
     public Optional<Sector> findById(UUID id) {
-        return sectorEntityRepository.findById(id)
-                .map(SectorEntity::toSector);
+        return repository.findById(id)
+                .map(SectorEntity::toDomain);
     }
 
     @Override
@@ -55,12 +55,13 @@ public class SectorRepositoryImpl implements SectorRepository {
         }
 
         return new RestPage<>(
-                sectorEntityRepository.findAll(specification, pageable).map(SectorEntity::toSector)
+                repository.findAll(specification, pageable).map(SectorEntity::toDomain)
         );
     }
 
     @Override
+    @CacheEvict(value = "sectors", allEntries = true)
     public void deleteById(UUID id) {
-        sectorEntityRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }

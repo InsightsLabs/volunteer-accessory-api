@@ -10,6 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.LogUtils.logError;
+
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -17,13 +19,15 @@ public class ResponseStatusExceptionControllerAdvice {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ApiError> handleResponseStatusException(ResponseStatusException ex) {
+        logError(log, ex);
 
         return ResponseEntity.status(ex.getStatusCode()).body(new ApiError(
                 new Date(),
                 ex.getBody().getTitle(),
                 ex.getBody().getStatus(),
                 ex.getBody().getDetail(),
-                ex.getMessage()
+                ex.getMessage(),
+                ex.getClass().getSimpleName()
         ));
     }
 }

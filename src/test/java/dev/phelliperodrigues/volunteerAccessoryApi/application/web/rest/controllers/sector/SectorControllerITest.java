@@ -1,11 +1,11 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.sector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplication;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.SectorRequest;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.SectorService;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.sector.SectorService;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.Exceptions;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -47,9 +47,9 @@ class SectorControllerITest {
 
     @Autowired
     private MockMvc mvc;
-    
+
     @MockBean
-    SectorService sectorService;
+    private SectorService sectorService;
 
 
     @Test
@@ -61,7 +61,7 @@ class SectorControllerITest {
                 .active(faker.bool().bool())
                 .build();
 
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.create(sector))
                 .willReturn(Sector.builder()
                         .id(UUID.randomUUID())
@@ -96,7 +96,7 @@ class SectorControllerITest {
                 .active(faker.bool().bool())
                 .build();
 
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.create(sector))
                 .willReturn(Sector.builder()
                         .id(UUID.randomUUID())
@@ -119,7 +119,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -130,7 +130,7 @@ class SectorControllerITest {
                 .name(faker.company().industry())
                 .build();
 
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.create(sector))
                 .willReturn(Sector.builder()
                         .id(UUID.randomUUID())
@@ -153,7 +153,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.header().string("Location", containsString("/api/v1/registrations/sectors/")))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -353,7 +353,7 @@ class SectorControllerITest {
                 .active(faker.bool().bool())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.update(sector, uuid.toString()))
                 .willReturn(Sector.builder()
                         .id(uuid)
@@ -387,7 +387,7 @@ class SectorControllerITest {
                 .active(faker.bool().bool())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.update(sector, uuid.toString()))
                 .willReturn(Sector.builder()
                         .id(UUID.randomUUID())
@@ -409,7 +409,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -420,7 +420,7 @@ class SectorControllerITest {
                 .name(faker.company().industry())
                 .build();
         var uuid = UUID.randomUUID();
-        var sector = request.toSector();
+        var sector = request.toDomain();
         BDDMockito.given(sectorService.update(sector, uuid.toString()))
                 .willReturn(Sector.builder()
                         .id(uuid)
@@ -442,7 +442,7 @@ class SectorControllerITest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("name").value(request.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("observations").value(request.getObservations()))
+                .andExpect(MockMvcResultMatchers.jsonPath("observations").doesNotExist())
                 .andExpect(MockMvcResultMatchers.jsonPath("active").value(request.isActive()));
     }
 
@@ -526,7 +526,7 @@ class SectorControllerITest {
                 .build();
         var uuid = UUID.randomUUID();
         var json = new ObjectMapper().writeValueAsString(request);
-        BDDMockito.given(sectorService.update(request.toSector(), uuid.toString()))
+        BDDMockito.given(sectorService.update(request.toDomain(), uuid.toString()))
                 .willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found"));
         var response = MockMvcRequestBuilders.put(SECTOR_API + "/" + uuid)
                 .contentType(MediaType.APPLICATION_JSON)

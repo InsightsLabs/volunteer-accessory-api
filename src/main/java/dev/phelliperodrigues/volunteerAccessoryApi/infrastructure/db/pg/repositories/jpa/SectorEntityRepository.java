@@ -1,6 +1,6 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.repositories.jpa;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.SectorEntity;
+import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.sector.SectorEntity;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
