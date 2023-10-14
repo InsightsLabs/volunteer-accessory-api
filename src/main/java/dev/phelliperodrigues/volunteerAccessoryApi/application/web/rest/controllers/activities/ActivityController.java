@@ -1,14 +1,13 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.subsector;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.activities;
 
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ApiError;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.subsector.SubSectorRequest;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector.SectorPageResponse;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.subsector.SubSectorPageResponse;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.subsector.SubSectorResponse;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.subsector.SubSectorService;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.activities.ActivityRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.activities.ActivitiesPageResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.activities.ActivityResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.activities.Activity;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.enums.BookType;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.activities.ActivityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,27 +29,27 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SUB_SECTOR_API;
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.ACTIVITIES_API;
 
 @Slf4j
 @RestController
-@RequestMapping(SUB_SECTOR_API)
-@Tag(name = "Sub Setor")
-public class SubSectorController {
+@RequestMapping(ACTIVITIES_API)
+@Tag(name = "Atividade")
+public class ActivityController {
 
-    private final SubSectorService service;
+    private final ActivityService service;
 
-    public SubSectorController(SubSectorService service) {
+    public ActivityController(ActivityService service) {
         this.service = service;
     }
 
     @Operation(
-            summary = "Criar um sub setor",
-            description = "Endpoint de criação de sub setor",
-            tags = {"Sub Setor"}
+            summary = "Criar uma 'atividade'",
+            description = "Endpoint de criação de 'atividade'",
+            tags = {"Atividade"}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Criado com sucesso", content = {@Content(schema = @Schema(implementation = SubSectorResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "201", description = "Criado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -59,21 +58,21 @@ public class SubSectorController {
     @Transactional
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<SubSectorResponse> create(@RequestBody @Valid SubSectorRequest request) {
-        var sector = service.create(request.toDomain());
-        return ResponseEntity.created(URI.create(SUB_SECTOR_API + "/" + sector.getId()))
-                .body(SubSectorResponse.build(sector));
+    public ResponseEntity<ActivityResponse> create(@RequestBody @Valid ActivityRequest request) {
+        var result = service.create(request.toDomain());
+        return ResponseEntity.created(URI.create(ACTIVITIES_API + "/" + result.getId()))
+                .body(ActivityResponse.build(result));
 
     }
 
     @Operation(
-            summary = "Buscar sub setor por id",
-            description = "Endpoint de busca de sub setor por ID",
-            tags = {"Sub Setor"}
+            summary = "Buscar 'atividade' por id",
+            description = "Endpoint de busca de 'atividade' por ID",
+            tags = {"Atividade"}
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SubSectorResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -82,19 +81,19 @@ public class SubSectorController {
             }
     )
     @GetMapping(value = "/{id}")
-    public ResponseEntity<SubSectorResponse> findById(@PathVariable String id) {
-        var sector = service.findById(id);
-        return ResponseEntity.ok(SubSectorResponse.build(sector));
+    public ResponseEntity<ActivityResponse> findById(@PathVariable String id) {
+        var result = service.findById(id);
+        return ResponseEntity.ok(ActivityResponse.build(result));
     }
 
     @Operation(
-            summary = "Buscar sub setor por termo {id, name, active}",
-            description = "Endpoint de busca de sub setores por termo paginada",
-            tags = {"Sub Setor"}
+            summary = "Buscar 'atividade' por termo {id, name, active}",
+            description = "Endpoint de busca de 'atividadees' por termo paginada",
+            tags = {"Atividade"}
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorPageResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = ActivitiesPageResponse.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -103,43 +102,39 @@ public class SubSectorController {
     )
     @PageableAsQueryParam
     @GetMapping
-    public ResponseEntity<SubSectorPageResponse> findAllBy(
-            @RequestParam(name = "id", required = false) String id,
+    public ResponseEntity<ActivitiesPageResponse> findAllBy(
+            @RequestParam(name = "id", required = false) UUID id,
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "active", required = false) Boolean active,
-            @RequestParam(name = "sectorName", required = false) String sectorName,
-            @RequestParam(name = "sectorId", required = false) String sectorId,
+            @RequestParam(name = "book_type", required = false) BookType bookType,
             @Parameter(hidden = true) Pageable pageable
     ) {
-        var search = SubSector.builder()
-                .idByString(id)
+        var search = Activity.builder()
+                .id(id)
                 .name(name)
-                .active(active)
-                .sector(Sector.builder().idByString(sectorId).name(sectorName).build())
+                .bookType(bookType)
                 .build();
 
         var result = service.findAllBy(search, pageable);
 
-        var sectorPaginate = new PageImpl<>(
+        var pageResponse = new PageImpl<>(
                 result.getContent()
                         .stream()
-                        .map(SubSectorResponse::build)
+                        .map(ActivityResponse::build)
                         .toList(),
                 pageable,
                 result.getTotalElements()
 
         );
-        log.info("{} sub sectors find", sectorPaginate.getTotalElements());
-        return ResponseEntity.ok(new SubSectorPageResponse(sectorPaginate));
+        return ResponseEntity.ok(new ActivitiesPageResponse(pageResponse));
     }
 
     @Operation(
-            summary = "Atualiza um sub setor pelo ID",
-            description = "Endpoint de atualização de sub setor",
-            tags = {"Sub Setor"}
+            summary = "Atualiza uma 'atividade' pelo ID",
+            description = "Endpoint de atualização de '",
+            tags = {"Atividade"}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Atualizado com sucesso", content = {@Content(schema = @Schema(implementation = SubSectorResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "200", description = "Atualizado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -148,16 +143,16 @@ public class SubSectorController {
     })
     @Transactional
     @PutMapping(value = "/{id}")
-    public ResponseEntity<SubSectorResponse> update(@RequestBody @Valid SubSectorRequest request, @PathVariable String id) {
-        var sector = service.update(request.toDomain(), id);
-        return ResponseEntity.ok(SubSectorResponse.build(sector));
+    public ResponseEntity<ActivityResponse> update(@RequestBody @Valid ActivityRequest request, @PathVariable String id) {
+        var result = service.update(request.toDomain(), id);
+        return ResponseEntity.ok(ActivityResponse.build(result));
     }
 
 
     @Operation(
-            summary = "Deletar um sub setor pelo ID",
-            description = "Endpoint para deletar sub setor",
-            tags = {"Sub Setor"}
+            summary = "Deletar uma 'atividade' pelo ID",
+            description = "Endpoint para deletar 'atividade'",
+            tags = {"Atividade"}
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),
@@ -174,9 +169,9 @@ public class SubSectorController {
     }
 
     @Operation(
-            summary = "Deletar um sub setor pelo ID",
-            description = "Endpoint para deletar sub setor",
-            tags = {"Sub Setor"}
+            summary = "Deletar varias 'atividades' pelo ID",
+            description = "Endpoint para deletar 'atividades' pela lista de ID",
+            tags = {"Atividade"}
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),

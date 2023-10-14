@@ -246,6 +246,18 @@ class SectorServiceTest {
     }
 
     @Test
+    @DisplayName("[DELETE ALL] Delete all sectors in the list")
+    public void test_deleteAll_deleteAllSubSectors() {
+        List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+
+        Mockito.doNothing().when(sectorRepository).deleteAllByIdInBatch(Mockito.any());
+
+        sectorService.deleteAll(ids);
+
+        Mockito.verify(sectorRepository, Mockito.times(1)).deleteAllByIdInBatch(Mockito.any());
+    }
+    
+    @Test
     @DisplayName("[DELETE ALL] Delete all sectors in the list with exception")
     public void test_deleteAll_deleteAllSectors_with_exceptions() {
         List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
