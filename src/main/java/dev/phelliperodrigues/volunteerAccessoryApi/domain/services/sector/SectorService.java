@@ -55,10 +55,9 @@ public class SectorService {
         return save;
     }
 
-    public void delete(String id) {
-        var found = findById(id);
-        repository.deleteById(found.getId());
-        log.info("Sector {} deleted", id);
+    public void delete(UUID id) {
+        repository.deleteById(id);
+        log.info("Sub Sector {} deleted", id);
 
     }
 

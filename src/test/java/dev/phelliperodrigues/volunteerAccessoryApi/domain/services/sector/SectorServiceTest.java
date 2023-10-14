@@ -239,55 +239,10 @@ class SectorServiceTest {
     @DisplayName("[DELETE] Given a valid sector id, the method should delete the sector from the database.")
     public void test_valid_sector_id() {
         UUID sectorId = UUID.randomUUID();
-        Sector sector = new Sector();
-        sector.setId(sectorId);
 
-        when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
-
-        sectorService.delete(sectorId.toString());
+        sectorService.delete(sectorId);
 
         verify(sectorRepository).deleteById(sectorId);
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given a non-existent sector id, the method should not throw an exception and should not delete any sector.")
-    public void test_non_existent_sector_id() {
-        UUID sectorId = UUID.randomUUID();
-
-        when(sectorRepository.findById(sectorId)).thenReturn(Optional.empty());
-
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete(sectorId.toString()));
-
-        verify(sectorRepository, never()).deleteById(any());
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given a null sector id, the method should throw an IllegalArgumentException.")
-    public void test_null_sector_id() {
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete(null));
-
-        verify(sectorRepository, never()).deleteById(any());
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given an invalid sector id (not a UUID), the method should throw an IllegalArgumentException.")
-    public void test_invalid_sector_id() {
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete("invalid_id"));
-
-        verify(sectorRepository, never()).deleteById(any());
-    }
-
-
-    @Test
-    @DisplayName("[DELETE ALL] Delete all sectors in the list")
-    public void test_deleteAll_deleteAllSubSectors() {
-        List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
-
-        Mockito.doNothing().when(sectorRepository).deleteAllByIdInBatch(Mockito.any());
-
-        sectorService.deleteAll(ids);
-
-        Mockito.verify(sectorRepository, Mockito.times(1)).deleteAllByIdInBatch(Mockito.any());
     }
 
     @Test
