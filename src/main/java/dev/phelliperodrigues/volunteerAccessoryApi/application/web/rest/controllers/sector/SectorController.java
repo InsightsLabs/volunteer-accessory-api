@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.SECTOR_API;
 
@@ -184,7 +185,7 @@ public class SectorController {
     @Transactional
     @DeleteMapping(value = "/all")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAll(@RequestBody List<String> ids) {
+    public void deleteAll(@RequestBody List<UUID> ids) {
         sectorService.deleteAll(ids);
     }
 

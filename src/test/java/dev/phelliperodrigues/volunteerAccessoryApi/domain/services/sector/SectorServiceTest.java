@@ -3,7 +3,6 @@ package dev.phelliperodrigues.volunteerAccessoryApi.domain.services.sector;
 import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.repositories.sector.SectorRepository;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.sector.SectorService;
 import dev.phelliperodrigues.volunteerAccessoryApi.utils.FakerUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -278,111 +280,26 @@ class SectorServiceTest {
 
     @Test
     @DisplayName("[DELETE ALL] Delete all sectors in the list")
-    public void test_deleteAll_deleteAllSectors() {
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
-                .toList();
+    public void test_deleteAll_deleteAllSubSectors() {
+        List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 
-        Mockito.when(sectorRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(sectors.get(0)))
-                .thenReturn(Optional.of(sectors.get(1)))
-                .thenReturn(Optional.of(sectors.get(2)));
-        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
+        Mockito.doNothing().when(sectorRepository).deleteAllByIdInBatch(Mockito.any());
 
         sectorService.deleteAll(ids);
 
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(1)).deleteAllByIdInBatch(Mockito.any());
     }
 
     @Test
-    @DisplayName("[DELETE ALL] Delete an empty list of sectors")
-    public void test_deleteAll_deleteEmptyList() {
-        List<String> ids = Collections.emptyList();
+    @DisplayName("[DELETE ALL] Delete all sectors in the list with exception")
+    public void test_deleteAll_deleteAllSectors_with_exceptions() {
+        List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+
+        Mockito.doThrow(new IllegalStateException()).when(sectorRepository).deleteAllByIdInBatch(Mockito.any());
 
         sectorService.deleteAll(ids);
 
-        Mockito.verify(sectorRepository, Mockito.never()).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.never()).deleteById(Mockito.any());
-    }
-
-    @Test
-    @DisplayName("[DELETE ALL] Attempt to delete a non-existent sector")
-    public void test_deleteAll_deleteNonExistentSector() {
-
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-
-        Mockito.when(sectorRepository.findById(Mockito.any()))
-                .thenReturn(Optional.empty());
-
-        sectorService.deleteAll(ids);
-
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.never()).deleteById(Mockito.any());
-    }
-
-    @Test
-    @DisplayName("[DELETE ALL] Attempt to delete a sector with an invalid id")
-    public void test_deleteAll_deleteInvalidId() {
-
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream().filter(id -> !id.equals("invalid"))
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
-                .toList();
-
-        Mockito.when(sectorRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(sectors.get(0)))
-                .thenReturn(Optional.of(sectors.get(1)))
-                .thenThrow(new IllegalArgumentException());
-
-
-        sectorService.deleteAll(ids);
-
-        Mockito.verify(sectorRepository, Mockito.times(2)).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.times(2)).deleteById(Mockito.any());
-    }
-
-    @Test
-    public void test_correct_number_of_sectors_deleted() {
-
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
-                .toList();
-
-
-        Mockito.when(sectorRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(sectors.get(0)))
-                .thenReturn(Optional.of(sectors.get(1)))
-                .thenReturn(Optional.of(sectors.get(2)));
-        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
-
-        sectorService.deleteAll(ids);
-
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
-    }
-
-    @Test
-    public void test_delete_method_called_for_each_sector_id() {
-
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        List<Sector> sectors = ids.stream()
-                .map(id -> Sector.builder().id(UUID.fromString(id)).name("Sector " + id).build())
-                .toList();
-
-
-        Mockito.when(sectorRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(sectors.get(0)))
-                .thenReturn(Optional.of(sectors.get(1)))
-                .thenReturn(Optional.of(sectors.get(2)));
-        Mockito.doNothing().when(sectorRepository).deleteById(Mockito.any());
-
-        sectorService.deleteAll(ids);
-
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).findById(Mockito.any());
-        Mockito.verify(sectorRepository, Mockito.times(ids.size())).deleteById(Mockito.any());
+        Mockito.verify(sectorRepository, Mockito.times(1)).deleteAllByIdInBatch(Mockito.any());
     }
 
 

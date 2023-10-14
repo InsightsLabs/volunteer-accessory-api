@@ -67,13 +67,11 @@ public class SubSectorService {
 
     }
 
-    public void deleteAll(List<String> ids) {
-        for (var id : ids) {
-            try {
-                delete(id);
-            } catch (Exception ex) {
-                log.error("Error deleting id {}", id);
-            }
+    public void deleteAll(List<UUID> ids) {
+        try {
+            repository.deleteAllByIdInBatch(ids);
+        } catch (Exception ex) {
+            log.error("Error deleting", ex);
         }
     }
 }

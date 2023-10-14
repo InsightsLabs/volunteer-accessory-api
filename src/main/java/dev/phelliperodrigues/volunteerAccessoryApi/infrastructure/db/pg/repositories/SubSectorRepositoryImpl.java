@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,8 +61,9 @@ public class SubSectorRepositoryImpl implements SubSectorRepository {
             specification = specification.and(SubSectorEntityRepository.bySectorId(sector.getSector().getId()));
         }
 
+        var results = repository.findAll(specification, pageable).map(SubSectorEntity::toDomain);
         return new RestPage<>(
-                repository.findAll(specification, pageable).map(SubSectorEntity::toDomain)
+                results
         );
     }
 
@@ -69,5 +71,11 @@ public class SubSectorRepositoryImpl implements SubSectorRepository {
     @CacheEvict(value = "sub_sectors", allEntries = true)
     public void deleteById(UUID id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    @CacheEvict(value = "sub_sectors", allEntries = true)
+    public void deleteAllByIdInBatch(List<UUID> id) {
+        repository.deleteAllByIdInBatch(id);
     }
 }
