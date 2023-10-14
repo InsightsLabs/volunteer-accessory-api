@@ -231,42 +231,10 @@ class SubSectorServiceTest {
     @DisplayName("[DELETE] Given a valid id, the method should delete from the database.")
     public void test_valid_sector_id() {
         UUID sectorId = UUID.randomUUID();
-        SubSector sector = new SubSector();
-        sector.setId(sectorId);
 
-        when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
-
-        sectorService.delete(sectorId.toString());
+        sectorService.delete(sectorId);
 
         verify(sectorRepository).deleteById(sectorId);
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given a non-existent id, the method should not throw an exception and should not delete any sector.")
-    public void test_non_existent_sector_id() {
-        UUID sectorId = UUID.randomUUID();
-
-        when(sectorRepository.findById(sectorId)).thenReturn(Optional.empty());
-
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete(sectorId.toString()));
-
-        verify(sectorRepository, never()).deleteById(any());
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given a null id, the method should throw an IllegalArgumentException.")
-    public void test_null_sector_id() {
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete(null));
-
-        verify(sectorRepository, never()).deleteById(any());
-    }
-
-    @Test
-    @DisplayName("[DELETE] Given an invalid id (not a UUID), the method should throw an IllegalArgumentException.")
-    public void test_invalid_sector_id() {
-        assertThrows(ResponseStatusException.class, () -> sectorService.delete("invalid_id"));
-
-        verify(sectorRepository, never()).deleteById(any());
     }
 
 
