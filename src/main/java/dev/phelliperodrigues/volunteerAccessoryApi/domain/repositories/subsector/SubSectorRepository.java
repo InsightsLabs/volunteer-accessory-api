@@ -4,6 +4,7 @@ import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface SubSectorRepository {
     Page<SubSector> findAllBy(SubSector sector, Pageable pageable);
 
     void deleteById(UUID id);
+
+    void deleteAllByIdInBatch(List<UUID> id);
 }

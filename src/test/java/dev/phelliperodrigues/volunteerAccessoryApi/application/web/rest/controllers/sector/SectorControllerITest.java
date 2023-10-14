@@ -573,7 +573,7 @@ class SectorControllerITest {
     @Test
     @DisplayName("[DELETE ALL] Should delete all sector")
     void deleteAll() throws Exception {
-        List<String> ids = Arrays.asList(UUID.randomUUID().toString(), "invalid", UUID.randomUUID().toString());
+        var ids = Arrays.asList(UUID.randomUUID(), UUID.nameUUIDFromBytes(new byte[0]), UUID.randomUUID());
         BDDMockito.doNothing().when(sectorService).deleteAll(ids);
         var json = new ObjectMapper().writeValueAsString(ids);
 
