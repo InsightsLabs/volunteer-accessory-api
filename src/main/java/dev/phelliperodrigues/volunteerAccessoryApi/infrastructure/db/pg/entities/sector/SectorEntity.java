@@ -29,6 +29,7 @@ public class SectorEntity {
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     private String observations;
