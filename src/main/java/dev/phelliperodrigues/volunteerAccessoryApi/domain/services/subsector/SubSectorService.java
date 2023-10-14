@@ -60,20 +60,17 @@ public class SubSectorService {
         return save;
     }
 
-    public void delete(String id) {
-        var found = findById(id);
-        repository.deleteById(found.getId());
+    public void delete(UUID id) {
+        repository.deleteById(id);
         log.info("Sub Sector {} deleted", id);
 
     }
 
-    public void deleteAll(List<String> ids) {
-        for (var id : ids) {
-            try {
-                delete(id);
-            } catch (Exception ex) {
-                log.error("Error deleting id {}", id);
-            }
+    public void deleteAll(List<UUID> ids) {
+        try {
+            repository.deleteAllByIdInBatch(ids);
+        } catch (Exception ex) {
+            log.error("Error deleting", ex);
         }
     }
 }

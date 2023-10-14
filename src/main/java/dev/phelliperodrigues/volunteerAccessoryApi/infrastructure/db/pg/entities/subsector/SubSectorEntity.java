@@ -31,10 +31,11 @@ public class SubSectorEntity {
 
     private String observations;
 
+    @Column(name = "active", nullable = false, columnDefinition = "boolean default false")
     private boolean active;
 
     @ManyToOne
-    @JoinColumn(name = "sector_id")
+    @JoinColumn(name = "sector_id", nullable = false)
     private SectorEntity sector;
 
     @Column(name = "create_user_id", nullable = false, updatable = false)

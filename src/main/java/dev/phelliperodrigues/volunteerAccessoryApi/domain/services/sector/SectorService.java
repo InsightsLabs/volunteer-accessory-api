@@ -19,19 +19,19 @@ import static dev.phelliperodrigues.volunteerAccessoryApi.utils.UUID.fromStrg;
 @RequiredArgsConstructor
 public class SectorService {
 
-    private final SectorRepository sectorRepository;
+    private final SectorRepository repository;
 
     public Sector create(Sector sector) {
         log.info("create sector");
         sector.setCreateUserId(UUID.randomUUID());
-        var created = sectorRepository.save(sector);
+        var created = repository.save(sector);
         log.info("Sector {} created", created.getId());
         return created;
     }
 
     public Sector findById(String id) {
         var uuid = fromStrg(id);
-        var sector = sectorRepository.findById(uuid)
+        var sector = repository.findById(uuid)
                 .orElseThrow(() -> Exceptions.notFoundException("Setor não Encontrado: " + id));
         log.info("Sector {} found", sector.getId());
         return sector;
@@ -39,7 +39,7 @@ public class SectorService {
 
     public Page<Sector> findAllBy(Sector sector, Pageable pageable) {
         log.info("find all sector by: {}", sector);
-        var sectors = sectorRepository.findAllBy(sector, pageable);
+        var sectors = repository.findAllBy(sector, pageable);
         log.info("Sectors {} found", sectors.getTotalElements());
         return sectors;
     }
@@ -50,25 +50,22 @@ public class SectorService {
         var found = findById(id);
         found.update(sector);
 
-        var save = sectorRepository.save(found);
+        var save = repository.save(found);
         log.info("Sector {} updated", save.getId());
         return save;
     }
 
-    public void delete(String id) {
-        var found = findById(id);
-        sectorRepository.deleteById(found.getId());
-        log.info("Sector {} deleted", id);
+    public void delete(UUID id) {
+        repository.deleteById(id);
+        log.info("Sub Sector {} deleted", id);
 
     }
 
-    public void deleteAll(List<String> ids) {
-        for (var id : ids) {
-            try {
-                delete(id);
-            } catch (Exception ex) {
-                log.error("Error deleting id {}", id, ex);
-            }
+    public void deleteAll(List<UUID> ids) {
+        try {
+            repository.deleteAllByIdInBatch(ids);
+        } catch (Exception ex) {
+            log.error("Error deleting", ex);
         }
     }
 }
