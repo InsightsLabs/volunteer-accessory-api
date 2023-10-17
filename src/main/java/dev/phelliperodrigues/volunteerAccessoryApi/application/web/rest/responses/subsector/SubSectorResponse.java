@@ -1,7 +1,7 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.subsector;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector.SectorResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector.SampleSectorResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +20,7 @@ public class SubSectorResponse {
     private String name;
     private String observations;
     private Boolean active;
-    private SectorResponse sector;
+    private SampleSectorResponse sector;
 
 
     public static SubSectorResponse build(SubSector subSector) {
@@ -29,7 +29,7 @@ public class SubSectorResponse {
                 .name(subSector.getName())
                 .observations(subSector.getObservations())
                 .active(subSector.getActive())
-                .sector(SectorResponse.build(subSector.getSector()))
+                .sector(SampleSectorResponse.build(subSector.getSector()))
                 .build();
     }
 }

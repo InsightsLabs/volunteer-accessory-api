@@ -1,13 +1,14 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.activities;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.controllers.prayerHouses;
 
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ApiError;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.activities.ActivityRequest;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.activities.ActivityResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.prayerHouses.PrayingHouseRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.common.PageResponse;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.activities.Activity;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.enums.BookType;
-import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.activities.ActivityService;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.prayerHouses.PrayingHouseResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.prayerHouses.PrayingHouse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.prayerHouses.PrayingHouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,27 +30,27 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.ACTIVITIES_API;
+import static dev.phelliperodrigues.volunteerAccessoryApi.utils.Endpoints.PRAYER_HOUSES_APY;
 
 @Slf4j
 @RestController
-@RequestMapping(ACTIVITIES_API)
-@Tag(name = "Atividade")
-public class ActivityController {
+@RequestMapping(PRAYER_HOUSES_APY)
+@Tag(name = "Casa de Oração")
+public class PrayingHouseController {
 
-    private final ActivityService service;
+    private final PrayingHouseService service;
 
-    public ActivityController(ActivityService service) {
+    public PrayingHouseController(PrayingHouseService service) {
         this.service = service;
     }
 
     @Operation(
-            summary = "Criar uma 'atividade'",
-            description = "Endpoint de criação de 'atividade'",
-            tags = {"Atividade"}
+            summary = "Criar uma 'casa de oração'",
+            description = "Endpoint de criação de 'casa de oração'",
+            tags = {"Casa de Oração"}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Criado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "201", description = "Criado com sucesso", content = {@Content(schema = @Schema(implementation = PrayingHouseResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -58,21 +59,21 @@ public class ActivityController {
     @Transactional
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ActivityResponse> create(@RequestBody @Valid ActivityRequest request) {
+    public ResponseEntity<PrayingHouseResponse> create(@RequestBody @Valid PrayingHouseRequest request) {
         var result = service.create(request.toDomain());
-        return ResponseEntity.created(URI.create(ACTIVITIES_API + "/" + result.getId()))
-                .body(ActivityResponse.build(result));
+        return ResponseEntity.created(URI.create(PRAYER_HOUSES_APY + "/" + result.getId()))
+                .body(PrayingHouseResponse.build(result));
 
     }
 
     @Operation(
-            summary = "Buscar 'atividade' por id",
-            description = "Endpoint de busca de 'atividade' por ID",
-            tags = {"Atividade"}
+            summary = "Buscar 'casa de oração' por id",
+            description = "Endpoint de busca de 'casa de oração' por ID",
+            tags = {"Casa de Oração"}
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = PrayingHouseResponse.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -81,15 +82,15 @@ public class ActivityController {
             }
     )
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ActivityResponse> findById(@PathVariable String id) {
+    public ResponseEntity<PrayingHouseResponse> findById(@PathVariable String id) {
         var result = service.findById(id);
-        return ResponseEntity.ok(ActivityResponse.build(result));
+        return ResponseEntity.ok(PrayingHouseResponse.build(result));
     }
 
     @Operation(
-            summary = "Buscar 'atividade' por termo {id, name, active}",
+            summary = "Buscar 'casa de oração' por termo {id, name, active}",
             description = "Endpoint de busca de 'atividadees' por termo paginada",
-            tags = {"Atividade"}
+            tags = {"Casa de Oração"}
     )
     @ApiResponses(
             {
@@ -102,16 +103,20 @@ public class ActivityController {
     )
     @PageableAsQueryParam
     @GetMapping
-    public ResponseEntity<PageResponse<ActivityResponse>> findAllBy(
+    public ResponseEntity<PageResponse<PrayingHouseResponse>> findAllBy(
             @RequestParam(name = "id", required = false) UUID id,
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "book_type", required = false) BookType bookType,
+            @RequestParam(name = "sectorName", required = false) String sectorName,
+            @RequestParam(name = "sectorId", required = false) String sectorId,
+            @RequestParam(name = "subSectorName", required = false) String subSectorName,
+            @RequestParam(name = "subSectorId", required = false) String subSectorId,
             @Parameter(hidden = true) Pageable pageable
     ) {
-        var search = Activity.builder()
+        var search = PrayingHouse.builder()
                 .id(id)
                 .name(name)
-                .bookType(bookType)
+                .sector(Sector.builder().idByString(sectorId).name(sectorName).build())
+                .subSector(SubSector.builder().idByString(subSectorId).name(subSectorName).build())
                 .build();
 
         var result = service.findAllBy(search, pageable);
@@ -119,7 +124,7 @@ public class ActivityController {
         var pageResponse = new PageImpl<>(
                 result.getContent()
                         .stream()
-                        .map(ActivityResponse::build)
+                        .map(PrayingHouseResponse::build)
                         .toList(),
                 pageable,
                 result.getTotalElements()
@@ -129,12 +134,12 @@ public class ActivityController {
     }
 
     @Operation(
-            summary = "Atualiza uma 'atividade' pelo ID",
+            summary = "Atualiza uma 'casa de oração' pelo ID",
             description = "Endpoint de atualização de '",
-            tags = {"Atividade"}
+            tags = {"Casa de Oração"}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Atualizado com sucesso", content = {@Content(schema = @Schema(implementation = ActivityResponse.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "200", description = "Atualizado com sucesso", content = {@Content(schema = @Schema(implementation = PrayingHouseResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Não Encontrado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = MethodArgumentNotValidExceptionHandler.Error.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -143,16 +148,16 @@ public class ActivityController {
     })
     @Transactional
     @PutMapping(value = "/{id}")
-    public ResponseEntity<ActivityResponse> update(@RequestBody @Valid ActivityRequest request, @PathVariable String id) {
+    public ResponseEntity<PrayingHouseResponse> update(@RequestBody @Valid PrayingHouseRequest request, @PathVariable String id) {
         var result = service.update(request.toDomain(), id);
-        return ResponseEntity.ok(ActivityResponse.build(result));
+        return ResponseEntity.ok(PrayingHouseResponse.build(result));
     }
 
 
     @Operation(
-            summary = "Deletar uma 'atividade' pelo ID",
-            description = "Endpoint para deletar 'atividade'",
-            tags = {"Atividade"}
+            summary = "Deletar uma 'casa de oração' pelo ID",
+            description = "Endpoint para deletar 'casa de oração'",
+            tags = {"Casa de Oração"}
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),
@@ -169,9 +174,9 @@ public class ActivityController {
     }
 
     @Operation(
-            summary = "Deletar varias 'atividades' pelo ID",
-            description = "Endpoint para deletar 'atividades' pela lista de ID",
-            tags = {"Atividade"}
+            summary = "Deletar varias 'casas de oração' pelo ID",
+            description = "Endpoint para deletar 'casas de oração' pela lista de ID",
+            tags = {"Casa de Oração"}
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),

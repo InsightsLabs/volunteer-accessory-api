@@ -54,6 +54,8 @@ public class SectorEntity {
     private LocalDateTime updatedAt;
 
     public static SectorEntity from(Sector sector) {
+        if (sector == null)
+            return null;
         return SectorEntity.builder()
                 .id(sector.getId())
                 .name(sector.getName())

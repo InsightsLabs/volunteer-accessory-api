@@ -54,6 +54,8 @@ public class SubSectorEntity {
     private LocalDateTime updatedAt;
 
     public static SubSectorEntity from(SubSector sector) {
+        if (sector == null)
+            return null;
         return SubSectorEntity.builder()
                 .id(sector.getId())
                 .name(sector.getName())

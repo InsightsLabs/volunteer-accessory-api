@@ -52,6 +52,8 @@ public class ActivityEntity {
     private LocalDateTime updatedAt;
 
     public static ActivityEntity from(Activity entity) {
+        if (entity == null)
+            return null;
         return ActivityEntity.builder()
                 .id(entity.getId())
                 .name(entity.getName())

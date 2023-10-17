@@ -3,8 +3,7 @@ package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.control
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.ApiError;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.handlers.MethodArgumentNotValidExceptionHandler;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.subsector.SubSectorRequest;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.sector.SectorPageResponse;
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.subsector.SubSectorPageResponse;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.common.PageResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.subsector.SubSectorResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
@@ -94,7 +93,7 @@ public class SubSectorController {
     )
     @ApiResponses(
             {
-                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = SectorPageResponse.class), mediaType = "application/json")}),
+                    @ApiResponse(responseCode = "200", description = "Encontrado com sucesso", content = {@Content(schema = @Schema(implementation = PageResponse.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "400", description = "Requisição inválida", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "500", description = "Erro interno", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
                     @ApiResponse(responseCode = "401", description = "Não autorizado", content = {@Content(schema = @Schema(implementation = ApiError.class), mediaType = "application/json")}),
@@ -103,7 +102,7 @@ public class SubSectorController {
     )
     @PageableAsQueryParam
     @GetMapping
-    public ResponseEntity<SubSectorPageResponse> findAllBy(
+    public ResponseEntity<PageResponse<SubSectorResponse>> findAllBy(
             @RequestParam(name = "id", required = false) String id,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "active", required = false) Boolean active,
@@ -130,7 +129,7 @@ public class SubSectorController {
 
         );
         log.info("{} sub sectors find", sectorPaginate.getTotalElements());
-        return ResponseEntity.ok(new SubSectorPageResponse(sectorPaginate));
+        return ResponseEntity.ok(new PageResponse<>(sectorPaginate));
     }
 
     @Operation(
