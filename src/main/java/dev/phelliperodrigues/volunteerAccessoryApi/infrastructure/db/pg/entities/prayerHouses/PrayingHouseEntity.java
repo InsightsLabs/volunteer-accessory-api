@@ -23,7 +23,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "prayer_houses",
         indexes = {
-                @Index(name = "prayer_houses_name_text_pattern_ops_idx", columnList = "name")
+                @Index(name = "prayer_houses_name_text_pattern_ops_idx", columnList = "name"),
+                @Index(name = "prayer_houses_sector_id_text_idx", columnList = "sector_id"),
+                @Index(name = "prayer_houses_sub_sector_id_text_idx", columnList = "sub_sector_id")
         }
 )
 public class PrayingHouseEntity {
@@ -47,8 +49,8 @@ public class PrayingHouseEntity {
     @ManyToMany
     @JoinTable(
             name = "prayer_house_activities",
-            joinColumns = @JoinColumn(name = "activity_id"),
-            inverseJoinColumns = @JoinColumn(name = "praying_house_id")
+            joinColumns = @JoinColumn(name = "praying_house_id"),
+            inverseJoinColumns = @JoinColumn(name = "activity_id")
     )
     private List<ActivityEntity> activities = new ArrayList<>();
 
