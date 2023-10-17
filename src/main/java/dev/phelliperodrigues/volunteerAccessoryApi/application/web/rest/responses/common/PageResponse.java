@@ -1,4 +1,4 @@
-package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.activities;
+package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -8,11 +8,11 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ActivitiesPageResponse {
-    List<ActivityResponse> content;
+public class PageResponse<T> {
+    List<T> content;
     CustomPageable pageable;
 
-    public ActivitiesPageResponse(Page<ActivityResponse> page) {
+    public PageResponse(Page<T> page) {
         this.content = page.getContent();
         this.pageable = new CustomPageable(
                 page.getPageable().getPageNumber(),

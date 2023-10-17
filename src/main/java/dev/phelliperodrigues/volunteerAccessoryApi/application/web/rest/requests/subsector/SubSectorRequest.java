@@ -1,6 +1,6 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.subsector;
 
-import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SectorRequest;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SampleSectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +22,7 @@ public class SubSectorRequest {
     private String observations;
     private boolean active;
     @NotNull(message = "O sub setor precisa conter um setor valido")
-    private SectorRequest sector;
+    private SampleSectorRequest sector;
 
     public SubSector toDomain() {
         return SubSector.builder()

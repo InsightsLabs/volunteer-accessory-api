@@ -3,6 +3,7 @@ package dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.control
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import dev.phelliperodrigues.volunteerAccessoryApi.VolunteerAccessoryApiApplication;
+import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SampleSectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.sector.SectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests.subsector.SubSectorRequest;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
@@ -580,7 +581,7 @@ class SubSectorControllerITest {
                 .andExpect(MockMvcResultMatchers.jsonPath("status").value("Not Found"))
                 .andExpect(MockMvcResultMatchers.jsonPath("statusCode").value("404"));
     }
-    
+
     @Test
     @DisplayName("[DELETE] Should delete sector")
     void delete() throws Exception {
@@ -611,13 +612,10 @@ class SubSectorControllerITest {
     }
 
 
-    private SectorRequest buildSector() {
+    private SampleSectorRequest buildSector() {
 
-        return SectorRequest.builder()
+        return SampleSectorRequest.builder()
                 .id(UUID.randomUUID())
-                .name(faker.company().industry())
-                .observations(faker.lorem().paragraph())
-                .active(faker.bool().bool())
                 .build();
     }
 
