@@ -163,6 +163,10 @@
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/exception/**</exclude>
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/handlers/**
                         </exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/responses/**
+                        </exclude>
+                        <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/requests/**
+                        </exclude>
                         <exclude>**/dev/phelliperodrigues/volunteerAccessoryApi/infrastructure/**</exclude>
                         <exclude>
                             **/dev/phelliperodrigues/volunteerAccessoryApi/application/web/rest/interceptors/**
