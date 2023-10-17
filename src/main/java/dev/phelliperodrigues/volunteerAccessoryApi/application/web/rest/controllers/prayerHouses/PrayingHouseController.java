@@ -6,6 +6,8 @@ import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.requests
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.common.PageResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.application.web.rest.responses.prayerHouses.PrayingHouseResponse;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.prayerHouses.PrayingHouse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.services.prayerHouses.PrayingHouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -104,11 +106,17 @@ public class PrayingHouseController {
     public ResponseEntity<PageResponse<PrayingHouseResponse>> findAllBy(
             @RequestParam(name = "id", required = false) UUID id,
             @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "sectorName", required = false) String sectorName,
+            @RequestParam(name = "sectorId", required = false) String sectorId,
+            @RequestParam(name = "subSectorName", required = false) String subSectorName,
+            @RequestParam(name = "subSectorId", required = false) String subSectorId,
             @Parameter(hidden = true) Pageable pageable
     ) {
         var search = PrayingHouse.builder()
                 .id(id)
                 .name(name)
+                .sector(Sector.builder().idByString(sectorId).name(sectorName).build())
+                .subSector(SubSector.builder().idByString(subSectorId).name(subSectorName).build())
                 .build();
 
         var result = service.findAllBy(search, pageable);

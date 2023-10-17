@@ -38,4 +38,4 @@ ALTER TABLE prayer_house_activities
 ALTER TABLE prayer_house_activities
     ADD CONSTRAINT fk_prahouact_on_praying_house_entity FOREIGN KEY (praying_house_id) REFERENCES prayer_houses (id);
 
-CREATE INDEX activities_name_text_pattern_ops_idx ON activities (name);
+CREATE INDEX IF NOT EXISTS activities_name_text_pattern_ops_idx ON activities (name);

@@ -1,6 +1,9 @@
 package dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.prayerHouses;
 
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.activities.Activity;
 import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.prayerHouses.PrayingHouse;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.sector.Sector;
+import dev.phelliperodrigues.volunteerAccessoryApi.domain.entity.subsector.SubSector;
 import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.activities.ActivityEntity;
 import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.sector.SectorEntity;
 import dev.phelliperodrigues.volunteerAccessoryApi.infrastructure.db.pg.entities.subsector.SubSectorEntity;
@@ -85,6 +88,9 @@ public class PrayingHouseEntity {
         return PrayingHouse.builder()
                 .id(this.id)
                 .name(this.name)
+                .sector(this.getSectorDomain())
+                .subSector(this.getSubSectorDomain())
+                .activities(this.getActivityDomain())
                 .createUserId(this.createUserId)
                 .updateUserId(this.updateUserId)
                 .build();
@@ -95,6 +101,25 @@ public class PrayingHouseEntity {
             return List.of();
         }
         return this.activities;
+    }
+
+    private Sector getSectorDomain() {
+        if (this.sector == null)
+            return null;
+        return this.sector.toDomain();
+    }
+
+    private SubSector getSubSectorDomain() {
+        if (this.subSector == null)
+            return null;
+        return this.subSector.toDomain();
+    }
+
+    private List<Activity> getActivityDomain() {
+        if (this.activities == null) {
+            return List.of();
+        }
+        return this.activities.stream().map(ActivityEntity::toDomain).toList();
     }
 
 }
